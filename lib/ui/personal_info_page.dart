@@ -1,5 +1,4 @@
-import 'dart:developer';
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:meet_queue_volunteer/bloc/user_bloc.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +17,12 @@ class PersonalInfo extends StatefulWidget {
   
 class _PersonalInfoState extends State<PersonalInfo> {
 
-  final TextEditingController _nricController = TextEditingController();
+  // Map<String, TextEditingController> controllers;
+  TextEditingController _nricController;// = new TextEditingController();
+  TextEditingController _nameController;// = new TextEditingController();
+  TextEditingController _dobController;// = new TextEditingController();
+  DateTime selectedDate;
+
   final Helper helper = new Helper();
 
   // This regex is  for use when input is converted into uppsercase
@@ -31,7 +35,15 @@ class _PersonalInfoState extends State<PersonalInfo> {
   String token;
 
   @override
+  void initState() {
+    super.initState();
+    _nricController = new TextEditingController();
+    _nameController = new TextEditingController();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    
     return new Scaffold(
       resizeToAvoidBottomInset: false,
       body: new GestureDetector(
@@ -44,6 +56,14 @@ class _PersonalInfoState extends State<PersonalInfo> {
       );
   }
   
+  @override
+  void dispose() {
+    super.dispose();
+    _nricController.dispose();
+    _nameController.dispose();
+    _dobController.dispose();
+  }
+
   void showPersonalInfoPage() {
     Navigator.pushNamed(context, '/personal_info');
   }
@@ -144,10 +164,10 @@ class _PersonalInfoState extends State<PersonalInfo> {
     return Column(
       children: <Widget>[
         showLabel('Name'),
-        showInput('Your full name', false, null),
+        showInput('Your full name', false, _nameController),
         SizedBox(height: 50),
-        showLabel('NRIC'),
-        showDateSelector('DD / MM / YYYY'),
+        showLabel('Date of Birth'),
+        showDateSelector('DD / MM / YYYY', _dobController),
     ]);
   }
 
@@ -184,7 +204,6 @@ class _PersonalInfoState extends State<PersonalInfo> {
                   controller: controller,
                   maxLines: 1,
                   autofocus: false,
-                  initialValue: userBloc.user?.nric,
                   decoration: new InputDecoration(
                     hintText: hint,
                     border: InputBorder.none,
@@ -196,21 +215,16 @@ class _PersonalInfoState extends State<PersonalInfo> {
                   onFocusChange: (focus) async {
                     // Only NRIC text form field will has checkFocus set to true and controller not set to null.
                     if (checkFocus) {
-                      if (focus)
-                        log("hasFocus"); 
-                      else {
+                      if (!focus) {
                         if (nricExp.hasMatch(controller.text.toUpperCase())) {
                           try{
-                          await userBloc.searchUser(controller.text);
-                          }catch(e) {
+                            await userBloc.searchUser(controller.text.toUpperCase());
+                          } catch(e) {
                             // If error is unauthorised
                             if (e.toString() == ERROR_UNAUTHORISED)
                               Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
                           }
-                          
                         }
-                        else
-                          log("Wrong NRIC format");
                       }
                     }
                   }
@@ -222,58 +236,56 @@ class _PersonalInfoState extends State<PersonalInfo> {
       ))); 
   }
 
-  Widget showDateSelector(String hint) {
+  Widget showDateSelector(String hint, TextEditingController controller) {
     return 
-      Container(padding: const EdgeInsets.only(left: 15, top: 0, right: 0, bottom: 0),
-        decoration: myBoxDecoration(),
-        child:
-        Stack(
-          alignment: Alignment.centerRight, 
-          children: <Widget>[
-            TextFormField(
-              maxLines: 1,
-              obscureText: true,
-              autofocus: false,
-              enabled: false,
-              decoration: new InputDecoration(
-                hintText: hint,
-                icon: new Icon(
-                  Icons.calendar_today,
-                  color: Colors.grey,
-                ),
-                border: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                errorBorder: InputBorder.none,
-                disabledBorder: InputBorder.none,
-            )),
-            IconButton(
-              icon: Icon(Icons.calendar_today, color: BLUE_ICON_BUTTON),
-              onPressed: () {
-                // Future<DateTime> selectedDate = 
-                showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(2018),
-                  lastDate: DateTime(2030),
-                  builder: (BuildContext context, Widget child) {
-                    return Theme(
-                      data: ThemeData.dark(),
-                      child: child,
+      Consumer<UserBloc>(
+        builder: (context, userBloc, child) {
+          return Container(padding: const EdgeInsets.only(left: 15, top: 0, right: 0, bottom: 0),
+            decoration: myBoxDecoration(),
+            child:
+            Stack(
+              alignment: Alignment.centerRight, 
+              children: <Widget>[
+                TextFormField(
+                  maxLines: 1,
+                  autofocus: false,
+                  enabled: false,
+                  controller: userBloc.dobController,
+                  decoration: new InputDecoration(
+                    hintText: hint,
+                    icon: new Icon(
+                      Icons.calendar_today,
+                      color: Colors.grey,
+                    ),
+                    border: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                )),
+                IconButton(
+                  icon: Icon(Icons.calendar_today, color: BLUE_ICON_BUTTON),
+                  onPressed: () async {
+                    // Format date to the appropriate format
+                    DateTime tempDate = new DateFormat("dd-MM-yyyy").parse(userBloc.dobController?.text);
+                    selectedDate = await showDatePicker(
+                      context: context,
+                      initialDate: (userBloc.dobController?.text == null) ? DateTime.now() : tempDate,//DateTime.now(),//
+                      firstDate: DateTime(1920),
+                      lastDate: DateTime(2030),
+                      builder: (BuildContext context, Widget child) {
+                        return Theme(
+                          data: ThemeData.dark(),
+                          child: child,
+                        );
+                      },
                     );
-                  },
-                );
-                // Your codes...
-            }),
-        ],)
-          // Padding(
-          //   padding: const EdgeInsets.only(left: 0, top: 0, right: 45, bottom: 0),
-          //   child: 
-
-              // If value is not empty and user wasn't requesting for OTP
-              // validator: (value) => value.isEmpty && !isOtp ? 'OTP can\'t be empty' : null,
-              // onSaved: (value) => _otp = value.trim(),
-      ); 
+                    userBloc?.dobController?.text = DateFormat('dd-MM-yyyy').format(selectedDate);
+                }),
+              ],
+            )
+          );
+    }); 
   }
 
   Widget showDropDownButton(String hint) {
@@ -295,8 +307,18 @@ class _PersonalInfoState extends State<PersonalInfo> {
     return 
       Consumer<UserBloc>(
         builder: (context, userBloc, child) {
-          helper.displayToast(userBloc.msg);
-          // if (userBloc.errorMsg == ERROR_UNAUTHORISED)
+          
+          // Set up controller value
+          if (userBloc.user != null) {
+            _nameController.text = userBloc.user.name;
+            // _dobController.text = (userBloc.user.dob == null) ? "" : DateFormat('dd-MM-yyyy').format(userBloc.user.dob);
+            // _dobController.value = new TextEditingValue(text: DateFormat('dd-MM-yyyy').format(userBloc.user.dob));
+          }
+
+          if (userBloc.msg != "User not found.")
+            helper.displayToast(userBloc.msg);
+          if (userBloc.errorMsg != "" && userBloc.errorMsg != "User not found.")
+            helper.displayToast(userBloc.errorMsg);
           
           return Container();
       });

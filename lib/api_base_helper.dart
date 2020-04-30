@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
@@ -27,6 +28,7 @@ class ApiBaseHelper {
       var responseJson;
       var reqBody = json.encode(body);
       String token = await helper.getAuthToken();
+      
       try {
         final response = await http.post(
           _baseUrl + url, 
@@ -39,8 +41,10 @@ class ApiBaseHelper {
         responseJson = _returnResponse(response);
 
         // If user is unauthorised or jwt expired, remove saved token. 
-        if (responseJson == ERROR_UNAUTHORISED)
+        if (responseJson == ERROR_UNAUTHORISED) {
           await helper.setAuthToken("");
+          throw UnauthorisedException(ERROR_UNAUTHORISED);
+        }
       } on SocketException {
         throw FetchDataException('No Internet connection');
       }
@@ -50,17 +54,22 @@ class ApiBaseHelper {
   dynamic _returnResponse(http.Response response) {    
     switch (response.statusCode) {
       case 200:
-        var responseJson = json.decode(response.body.toString());
-        return responseJson;
+        log("200");
+        log(response.body.toString());
+        // return json.decode(
+        return json.decode(response.body.toString());
+        break;
       case 400:
         String message = json.decode(response.body)["message"];
         message = message == null ? "" : message;
         throw AppException(message);
       case 401:
       case 403:
-        String message = json.decode(response.body)["message"];
-        message = message == null ? "" : message;
-        throw UnauthorisedException(ERROR_UNAUTHORISED);
+        // Only this is returned instead of thrown to trigger token clearing process
+        return UnauthorisedException(ERROR_UNAUTHORISED);
+        break;
+      case 404:
+        throw NotFoundException(json.decode(response.body)["message"]);
       case 409:
         String message = json.decode(response.body)["message"];
         message = message == null ? "" : message;

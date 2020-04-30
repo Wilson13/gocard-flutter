@@ -46,6 +46,7 @@ class UserData {
     String floorNo;
     String address;
     String flatType;
+    DateTime dob;
     String phone;
     String authServer;
     DateTime createdAt;
@@ -65,6 +66,7 @@ class UserData {
         this.floorNo,
         this.address,
         this.flatType,
+        this.dob,
         this.phone,
         this.authServer,
         this.createdAt,
@@ -85,6 +87,7 @@ class UserData {
         floorNo: json["floorNo"],
         address: json["address"],
         flatType: json["flatType"],
+        dob: DateTime.parse(json["dob"]),
         phone: json["phone"],
         authServer: json["authServer"],
         createdAt: DateTime.parse(json["createdAt"]),
@@ -105,6 +108,7 @@ class UserData {
         "floorNo": floorNo,
         "address": address,
         "flatType": flatType,
+        "dob": dob.toIso8601String(),
         "phone": phone,
         "authServer": authServer,
         "createdAt": createdAt.toIso8601String(),

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:meet_queue_volunteer/api_base_helper.dart';
 import 'package:meet_queue_volunteer/response/user_response.dart';
 
@@ -16,18 +18,13 @@ class UserRepository {
   //   }
   // }
 
-  Future<UserData> searchUser(String nric) async{
+  Future<UserResponse> searchUser(String nric) async{
   
     Map reqBody = {
       "nric": nric
     };
 
     final response = await _apiHelper.post("user/search", reqBody);
-    if (response.statusCode == 200)
-      return UserResponse.fromJson(response.body).data;
-    else {
-      print(response.body);
-      throw Exception('Error from searching user');
-    }
+    return UserResponse.fromJson(response);
   }
 }

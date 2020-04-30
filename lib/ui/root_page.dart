@@ -40,7 +40,7 @@ class _RootPageState extends State<RootPage> {
     Helper helper = new Helper();
     String value = await helper.getAuthToken();
 
-    if (value != null) {
+    if (!(["", null, false, 0].contains(value))) {
       setState(() {
         authStatus = AuthStatus.LOGGED_IN;
       });
