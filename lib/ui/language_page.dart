@@ -93,7 +93,7 @@ class LanguagePage extends StatefulWidget {
                           fontWeight: FontWeight.normal),
                         ),
                         Image(
-                          image: AssetImage('assets/ft_logo.jpeg'),
+                          image: AssetImage('assets/images/ft_logo.jpeg'),
                           height: 60,)
                     ]
           )))),

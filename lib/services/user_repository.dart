@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:meet_queue_volunteer/api_base_helper.dart';
 import 'package:meet_queue_volunteer/response/user_response.dart';
 

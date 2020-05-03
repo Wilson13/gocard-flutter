@@ -6,9 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:meet_queue_volunteer/ui/language_page.dart';
 import 'package:meet_queue_volunteer/ui/login_page.dart';
 import 'package:meet_queue_volunteer/ui/root_page.dart';
-import 'package:provider/provider.dart';
 
-import 'bloc/user_bloc.dart';
 import 'ui/personal_info_page.dart';
 
 void main() => runApp(
@@ -50,9 +48,8 @@ class MyApp extends StatelessWidget {
         // When navigating to the "/second" route, build the SecondScreen widget.
         '/login': (context) => LoginPage(),
         '/language': (context) => LanguagePage(),
-        '/personal_info': (context) => ChangeNotifierProvider<UserBloc>(
-            create: (context) => UserBloc(),
-            child: PersonalInfo()),
+        // Automatically dispose it when ChangeNotifierProvider is removed from the widget tree.
+        '/personal_info': (context) => PersonalInfo(),
       },
     );
   }

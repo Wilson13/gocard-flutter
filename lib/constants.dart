@@ -4,6 +4,7 @@ import 'dart:ui';
 
 const String AUTH_KEY="AUTH_KEY";
 const String ERROR_UNAUTHORISED="UNAUTHORISED";
+const String DATE_FORMAT="dd / MM / yyyy";
 
 const BLACK_TEXT = const Color(0xFF231D1D);
 const BLUE_ENGLISH = const Color(0xFF7DB9DB);

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:meet_queue_volunteer/response/user_response.dart';
@@ -7,21 +5,24 @@ import 'package:meet_queue_volunteer/services/user_repository.dart';
 
 import '../constants.dart';
 
-class UserBloc extends ChangeNotifier {
+class UserBloc {
 
   UserData user;
-  bool isLoading;
   String errorMsg, msg;
-  TextEditingController dobController;
+  TextEditingController nricController, nameController, dobController, genderController, raceController, occupationController;
 
   UserRepository _userRepository;
 
-  UserBloc() {
+  UserBloc({@required this.nricController, 
+    @required this.nameController, 
+    @required this.dobController, 
+    @required this.genderController, 
+    @required this.raceController, 
+    @required this.occupationController}) {
+    user = new UserData();
     _userRepository = UserRepository();
-    isLoading = false;
     errorMsg = "";
     msg = "";
-    dobController = new TextEditingController(text: DateFormat('dd-MM-yyyy').format(DateTime.now()));
   }
 
   // Return a future so UI can handle unauthorised situation
@@ -29,7 +30,13 @@ class UserBloc extends ChangeNotifier {
     try {
       UserResponse userResponse = await _userRepository.searchUser(nric);
       user = userResponse.data;
-      dobController.text = (user.dob == null) ? "" : DateFormat('dd-MM-yyyy').format(user.dob);
+      nricController.text = user.nric;
+      nameController.text = user.name;
+      dobController.text = user.dob == null ? "" : DateFormat(DATE_FORMAT).format(user.dob);
+      genderController.text = user.gender == null ? "" : user.gender;
+      raceController.text = user.race == null ? "" : user.race;
+      occupationController.text = user.occupation == null ? "" : user.occupation;
+      // notifyListeners();
       return userResponse;
     } catch (e) {
       // Throw ERROR_UNAUTHORISED for UI to handle navigation, other errors
@@ -41,7 +48,14 @@ class UserBloc extends ChangeNotifier {
       print(e);
       return null;
     } finally {
-      notifyListeners();
+      // notifyListeners();
     }
   }
+
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  //   dobController.dispose();
+  // }
+
 }

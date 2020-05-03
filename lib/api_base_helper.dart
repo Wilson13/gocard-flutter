@@ -66,7 +66,7 @@ class ApiBaseHelper {
       case 401:
       case 403:
         // Only this is returned instead of thrown to trigger token clearing process
-        return UnauthorisedException(ERROR_UNAUTHORISED);
+        return ERROR_UNAUTHORISED;
         break;
       case 404:
         throw NotFoundException(json.decode(response.body)["message"]);
