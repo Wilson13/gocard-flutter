@@ -159,15 +159,14 @@ class _PhotoScreen extends State<PhotoScreen>{
                   future: _initializeControllerFuture,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
-
-                      // If no photo was taken, show camera preview.
+                      // Camera is ready
                       if(photoBloc.photoPath == null) {
+                        // If no photo was taken, show camera preview.
                         // No need to rotating, this only happens in emulator
                         // Transform.rotate(angle: - pi / 2, child: 
                         return CameraPreview(_controller);  
-                      } 
-                      // If photo was taken, show image.
-                      else {
+                      } else {
+                        // If photo was taken, show image.
                         return Image.file(File(photoBloc.photoPath));
                       }
                     } else {
@@ -182,52 +181,57 @@ class _PhotoScreen extends State<PhotoScreen>{
         Padding(
           padding: EdgeInsets.only(top: 50),
           child: 
-          SizedBox(
-          width: 450,
-          height: 76,
-          child: 
-            Consumer<PhotoBloc>(builder: (context, photoBloc, child) {
-              return RaisedButton(
-            shape: new RoundedRectangleBorder(
-            borderRadius: new BorderRadius.circular(20.0)),
-            color: PURPLE_THEME,
-            child: const Text(
-              'Capture',
-              style: TextStyle(
-                color: Colors.white, 
-                fontFamily: 'SourceSansPro',
-                fontSize: 22,
-                fontStyle: FontStyle.normal,
-                fontWeight: FontWeight.normal
-              )
-            ),
-            onPressed: () async {
-              // Take the Picture in a try / catch block. If anything goes wrong,
-              // catch the error.
-              try {
-                // Ensure that the camera is initialized.
-                await _initializeControllerFuture;
+            SizedBox(
+            width: 450,
+            height: 76,
+              child: Consumer<PhotoBloc>(builder: (context, photoBloc, child) {
+                String buttonTxt = photoBloc.photoPath == null ? 'Capture' : 'Cancel';
+                return RaisedButton(
+                  shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(20.0)),
+                  color: PURPLE_THEME,
+                  child: Text(
+                    buttonTxt,
+                    style: TextStyle(
+                      color: Colors.white, 
+                      fontFamily: 'SourceSansPro',
+                      fontSize: 22,
+                      fontStyle: FontStyle.normal,
+                      fontWeight: FontWeight.normal
+                    )
+                  ),
+                  onPressed: () async {
+                    if (photoBloc.photoPath == null) {
+                      // Take the Picture in a try / catch block. If anything goes wrong,
+                      // catch the error.
+                      try {
+                        // Ensure that the camera is initialized.
+                        await _initializeControllerFuture;
 
-                // Construct the path where the image should be saved using the
-                // pattern package.
-                final path = Path.join(
-                  // Store the picture in the temp directory.
-                  // Find the temp directory using the `path_provider` plugin.
-                  (await getTemporaryDirectory()).path,
-                  '${DateTime.now()}.png',
-                );
+                        // Construct the path where the image should be saved using the
+                        // pattern package.
+                        final path = Path.join(
+                          // Store the picture in the temp directory.
+                          // Find the temp directory using the `path_provider` plugin.
+                          (await getTemporaryDirectory()).path,
+                          '${DateTime.now()}.png',
+                        );
 
-                // Attempt to take a picture and log where it's been saved.
-                await _controller.takePicture(path);
-                // Rotate image to correct orientation
+                        // Attempt to take a picture and log where it's been saved.
+                        await _controller.takePicture(path);
+                        // Rotate image to correct orientation
 
-                // Pass photo to BLOC
-                photoBloc.setPath(path);
-              } catch (e) {
-                // If an error occurs, log the error to the console.
-                print(e);
-              }},
-          );})
+                        // Pass photo to BLOC
+                        photoBloc.setPath(path);
+                      } catch (e) {
+                        // If an error occurs, log the error to the console.
+                        print(e);
+                      }
+                    } else {
+                      photoBloc.setPath(null);
+                    }
+                  }
+                );})
           ),
         )
     ]);

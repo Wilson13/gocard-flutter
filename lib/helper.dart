@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'constants.dart' as Constants;
+import 'constants.dart';
 
 class Helper {
 
@@ -35,5 +36,17 @@ class Helper {
   void userUnauthenticated(context) {
     // Remove all routes and redirect user to root page
     Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
+  }
+
+  BoxDecoration myBoxDecoration() {
+    return BoxDecoration(
+      border: Border.all(
+        color: BLUE_INPUT_BORDER,
+        width: 1.0
+      ),
+      borderRadius: BorderRadius.all(
+          Radius.circular(5.0) 
+      ),
+    );
   }
 }

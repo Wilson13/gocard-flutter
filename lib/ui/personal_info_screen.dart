@@ -72,8 +72,8 @@ class _PersonalInfo extends State<PersonalInfoScreen>{
     // }
     
     Widget makeBody() {
-      return Provider<UserBloc>(
-        create: (context) => UserBloc(
+      return Provider<PersonalInfoBloc>(
+        create: (context) => PersonalInfoBloc(
           nricController: _nricController,
           nameController: _nameController,
           occupationController: _occupationController,
@@ -169,7 +169,7 @@ class _PersonalInfo extends State<PersonalInfoScreen>{
             // mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               showLabel('NRIC'),
-              Consumer<UserBloc>(builder: (context, personalBloc, child) {
+              Consumer<PersonalInfoBloc>(builder: (context, personalBloc, child) {
                 return showNricInput('S9876543A', true,  personalBloc.nricController);
               }),
               
@@ -224,8 +224,8 @@ class _PersonalInfo extends State<PersonalInfoScreen>{
               // Consumer<PersonalInfoBloc>(builder: (context, personalBloc, child) {
               //   return showHiddenTextField(personalBloc.occupationController);
               // }),
-              showLabel('Phone Number'),
-              showCommonInput('1234 5678', _phoneController, true),
+              showLabel('Contact Number'),
+              showCommonInput('12345678', _phoneController, true),
       ]));
     }
   
@@ -283,7 +283,7 @@ class _PersonalInfo extends State<PersonalInfoScreen>{
         Padding(
           padding: const EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 0),
           child: 
-          Consumer<UserBloc>(
+          Consumer<PersonalInfoBloc>(
             builder: (context, personalBloc, child) {
               return Focus(
                 child: TextFormField(
@@ -336,7 +336,7 @@ class _PersonalInfo extends State<PersonalInfoScreen>{
   
     Widget showDateSelector(String hint) {
       return 
-        Consumer<UserBloc>(
+        Consumer<PersonalInfoBloc>(
           builder: (context, personalBloc, child) {
             return Container(padding: const EdgeInsets.only(left: 15, top: 0, right: 0, bottom: 0),
               decoration: myBoxDecoration(),
@@ -394,7 +394,7 @@ class _PersonalInfo extends State<PersonalInfoScreen>{
 
     Widget showGenderDropDown() {
       return 
-        Consumer<UserBloc>(
+        Consumer<PersonalInfoBloc>(
           builder: (context, personalBloc, child) {
             return showDropDownButton('Select', ['male', 'female'], personalBloc.genderController);
         });
@@ -402,7 +402,7 @@ class _PersonalInfo extends State<PersonalInfoScreen>{
   
     Widget showRaceDropDown() {
       return 
-        Consumer<UserBloc>(
+        Consumer<PersonalInfoBloc>(
           builder: (context, personalBloc, child) {
             // return showConsumerDropDownButton('Select', ['chinese', 'malay', 'indian', 'other']);
             return showDropDownButton('Select', ['chinese', 'malay', 'indian', 'other'], personalBloc.raceController);
@@ -524,7 +524,7 @@ class _PersonalInfo extends State<PersonalInfoScreen>{
       IconData iconData = isBack ? Icons.arrow_back_ios : Icons.arrow_forward_ios;
       
       return 
-      Consumer<UserBloc>(builder: (context, personalBloc, child) {
+      Consumer<PersonalInfoBloc>(builder: (context, personalBloc, child) {
         return Container(
           decoration: 
             BoxDecoration(
@@ -545,7 +545,7 @@ class _PersonalInfo extends State<PersonalInfoScreen>{
                     Navigator.pushNamed(
                       context,
                       '/address',
-                       arguments: Provider.of<UserBloc>(context, listen: false).userData);
+                       arguments: Provider.of<PersonalInfoBloc>(context, listen: false).userData);
                   }
                 } else {
                   Navigator.pop(context);
@@ -557,7 +557,7 @@ class _PersonalInfo extends State<PersonalInfoScreen>{
   
     Widget showMsg() {
       return 
-        Consumer<UserBloc>(
+        Consumer<PersonalInfoBloc>(
           builder: (context, personalBloc, child) {
             
             if (personalBloc.msg != "User not found.")

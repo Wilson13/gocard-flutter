@@ -5,7 +5,7 @@ import 'package:meet_queue_volunteer/services/user_repository.dart';
 
 import '../constants.dart';
 
-class UserBloc {
+class PersonalInfoBloc {
 
   UserData userData;
   String errorMsg, msg;
@@ -13,7 +13,7 @@ class UserBloc {
 
   UserRepository _userRepository;
 
-  UserBloc({
+  PersonalInfoBloc({
     @required this.nricController, 
     @required this.nameController, 
     @required this.dobController, 

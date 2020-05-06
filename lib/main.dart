@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:meet_queue_volunteer/ui/language_screen.dart';
 import 'package:meet_queue_volunteer/ui/photo_screen.dart';
 import 'package:meet_queue_volunteer/ui/root_page.dart';
+import 'package:meet_queue_volunteer/ui/subject_screen.dart';
 
 import 'ui/address_screen.dart';
 import 'ui/login_screen.dart';
@@ -61,7 +62,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: PhotoScreen.routeName,//'/',
+      initialRoute: SubjectScreen.routeName,//'/',
       routes: {
         // When navigating to the "/" route, build the FirstScreen widget.
         '/': (context) => RootPage(),
@@ -72,6 +73,7 @@ class MyApp extends StatelessWidget {
         '/personal_info': (context) => PersonalInfoScreen(),
         AddressScreen.routeName: (context) => AddressScreen(),
         PhotoScreen.routeName: (context) => PhotoScreen(camera: firstCamera),
+        SubjectScreen.routeName: (context) => SubjectScreen(),
       },
     );
   }
