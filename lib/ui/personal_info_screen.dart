@@ -2,30 +2,34 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:meet_queue_volunteer/bloc/user_bloc.dart';
+import 'package:meet_queue_volunteer/bloc/personal_info_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:meet_queue_volunteer/helper.dart';
 
 import '../constants.dart';
 
-class PersonalInfo extends StatefulWidget {
+class PersonalInfoScreen extends StatefulWidget {
 
-  PersonalInfo();
+  PersonalInfoScreen();
 
   @override
   State<StatefulWidget> createState() => new _PersonalInfo();
 }
   
-class _PersonalInfo extends State<PersonalInfo>{
+class _PersonalInfo extends State<PersonalInfoScreen>{
 
   final TextEditingController _nricController = new TextEditingController();
   final TextEditingController _nameController = new TextEditingController();
   final TextEditingController _occupationController = new TextEditingController();
+  final TextEditingController _phoneController = new TextEditingController();
   final TextEditingController _dobController = new TextEditingController(text: DateFormat(DATE_FORMAT).format(DateTime.now()));
   final TextEditingController _genderController = new TextEditingController();
   final TextEditingController _raceController = new TextEditingController();
+  final TextEditingController _maritalController = new TextEditingController();
+  final TextEditingController _numChildController = new TextEditingController();
   final StreamController<String> _raceStreamController = new StreamController<String>();
-  // final String token;
+
+  // This regex is  for use when input is converted into uppsercase
   final RegExp nricExp = new RegExp(
     r"^(S|T|F|G|)[0-9]{7}[A-Z]$",
     caseSensitive: false,
@@ -42,13 +46,6 @@ class _PersonalInfo extends State<PersonalInfo>{
      @override
     Widget build(BuildContext context) {
         
-      // Map<String, TextEditingController> controllers;
-      // DateTime selectedDate;
-      
-  
-      // This regex is  for use when input is converted into uppsercase
-      
-  
       final bottom = MediaQuery.of(context).viewInsets.bottom;
       return new Scaffold(
         resizeToAvoidBottomInset: false,
@@ -63,8 +60,8 @@ class _PersonalInfo extends State<PersonalInfo>{
                 }, 
               child: Form(
                 key: _formKey,
-                autovalidate: true,
-                child: makeBody(context)
+                autovalidate: false,
+                child: makeBody()
               )
             )
         ))));
@@ -74,15 +71,18 @@ class _PersonalInfo extends State<PersonalInfo>{
     //   Navigator.pushNamed(context, '/personal_info');
     // }
     
-    Widget makeBody(context) {
+    Widget makeBody() {
       return Provider<UserBloc>(
         create: (context) => UserBloc(
           nricController: _nricController,
           nameController: _nameController,
           occupationController: _occupationController,
+          phoneController: _phoneController,
           dobController: _dobController,
           genderController: _genderController,
-          raceController: _raceController
+          raceController: _raceController,
+          maritalController: _maritalController,
+          numChildController: _numChildController
           ),
         child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -96,12 +96,12 @@ class _PersonalInfo extends State<PersonalInfo>{
               children: <Widget> [
                 drawHeader("Personal Information", BLACK_HEADER_HIGHLIGHT),
                 drawHeader("Address", BLACK_HEADER_DISABLED),
-                drawHeader("Subject", BLACK_HEADER_DISABLED),
-                drawHeader("Photo", BLACK_HEADER_DISABLED),            
+                drawHeader("Photo", BLACK_HEADER_DISABLED),
+                drawHeader("Subject", BLACK_HEADER_DISABLED),            
               ]
             )), 
             // Cancel button
-            SizedBox(width: 180, child: drawCancelButton(context))
+            SizedBox(width: 180, child: drawCancelButton())
           ]),
           // Content column with four rows inside
           // Expanded(child: // Disable this if centered is required
@@ -169,8 +169,8 @@ class _PersonalInfo extends State<PersonalInfo>{
             // mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               showLabel('NRIC'),
-              Consumer<UserBloc>(builder: (context, userBloc, child) {
-                return showNricInput('S9876543A', true,  userBloc.nricController);
+              Consumer<UserBloc>(builder: (context, personalBloc, child) {
+                return showNricInput('S9876543A', true,  personalBloc.nricController);
               }),
               
               SizedBox(height: 50),
@@ -191,9 +191,11 @@ class _PersonalInfo extends State<PersonalInfo>{
                     Expanded(child: showRaceDropDown()),
                 ]),
               SizedBox(height: 50),
-              showLabel('Occupation'),
-              showCommonInput('Occupation', _occupationController),
-              // showOccupationDropDown(),
+              showLabel('Marital Status'),
+              showDropDownButton('Select', ['single', 'married', 'divorced'], _maritalController),
+              SizedBox(height: 50),
+              showLabel('No. of Children'),
+              showCommonInput('0', _numChildController, false),
               showMsg(),
       ]));
     }
@@ -205,19 +207,25 @@ class _PersonalInfo extends State<PersonalInfo>{
             // mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               showLabel('Name'),
-              showCommonInput('Your full name', _nameController),
+              showCommonInput('Your full name', _nameController, true),
               SizedBox(height: 50),
               showLabel('Date of Birth'),
               showDateSelector('DD / MM / YYYY'),
-              SizedBox(height: 50),
-              showLabel(''),
+              SizedBox(height: 40),
+              showLabel('Occupation (NA if not applicable)'),
+              showCommonInput('Occupation', _occupationController, true),
+              SizedBox(height: 48),
+              // showLabel(''),
               // showHiddenDropDownButton('', []),
               // Show a hidden textfield on the right and also providing
               // the same controller to ensure even after validation,
               // both rows remain aligned.
-              Consumer<UserBloc>(builder: (context, userBloc, child) {
-                return showHiddenTextField(userBloc.occupationController);
-              }),
+              // showHiddenDropDownButton("hint", ["test"]),
+              // Consumer<PersonalInfoBloc>(builder: (context, personalBloc, child) {
+              //   return showHiddenTextField(personalBloc.occupationController);
+              // }),
+              showLabel('Phone Number'),
+              showCommonInput('1234 5678', _phoneController, true),
       ]));
     }
   
@@ -239,9 +247,9 @@ class _PersonalInfo extends State<PersonalInfo>{
       ));
     }
   
-    // Input that doesn't need to use UserBloc, hence no need for rebuild, 
+    // Input that doesn't need to use personalBloc, hence no need for rebuild, 
     // controllers will help update the text value.
-    Widget showCommonInput(String hint, TextEditingController controller) {
+    Widget showCommonInput(String hint, TextEditingController controller, bool isRequired) {
       return 
         Padding(
           padding: const EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 0),
@@ -258,11 +266,12 @@ class _PersonalInfo extends State<PersonalInfo>{
                 disabledBorder: InputBorder.none,
               ),
               validator: (value) {
-                if (value.isEmpty) {
+                if (isRequired && value.isEmpty) {
                   return 'Please enter some text';
                 }
                 return null;
               },
+              onSaved: (value) => controller.text = value,
         ));
     }
   
@@ -275,7 +284,7 @@ class _PersonalInfo extends State<PersonalInfo>{
           padding: const EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 0),
           child: 
           Consumer<UserBloc>(
-            builder: (context, userBloc, child) {
+            builder: (context, personalBloc, child) {
               return Focus(
                 child: TextFormField(
                 controller: controller,
@@ -290,28 +299,30 @@ class _PersonalInfo extends State<PersonalInfo>{
                   disabledBorder: InputBorder.none,
                 ),
                 validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please enter some text';
+                  if (!nricExp.hasMatch(value.toUpperCase())) {
+                    return 'NRIC format is wrong.';
                   }
                   return null;
                 },
+                onSaved: (value) => controller.text = value.toUpperCase(),
                 ),
                 onFocusChange: (focus) async {
                   // Only NRIC text form field will has checkFocus set to true and controller not set to null.
                   if (checkFocus) {
                     if (!focus) {
-                      if (nricExp.hasMatch(userBloc.nricController.text.toUpperCase())) {
+                      personalBloc.nricController.text = personalBloc.nricController.text.toUpperCase();
+                      if (nricExp.hasMatch(personalBloc.nricController.text)) {
                         try{
-                          await userBloc.searchUser(controller.text.toUpperCase());
-                          _raceStreamController.sink.add(userBloc.user.race);
+                          await personalBloc.searchUser(controller.text.toUpperCase());
+                          _raceStreamController.sink.add(personalBloc.userData.race);
                           // setState(() {
-                          //   selectedValue = userBloc.user.race;
+                          //   selectedValue = personalBloc.user.race;
                           // });
                           FocusScope.of(context).requestFocus(FocusNode());
                         } catch(e) {
                           // If error is unauthorised
                           if (e.toString() == ERROR_UNAUTHORISED)
-                            navigateToRoot(context);
+                            navigateToRoot();
                         }
                       }
                     }
@@ -326,7 +337,7 @@ class _PersonalInfo extends State<PersonalInfo>{
     Widget showDateSelector(String hint) {
       return 
         Consumer<UserBloc>(
-          builder: (context, userBloc, child) {
+          builder: (context, personalBloc, child) {
             return Container(padding: const EdgeInsets.only(left: 15, top: 0, right: 0, bottom: 0),
               decoration: myBoxDecoration(),
               child:
@@ -337,7 +348,7 @@ class _PersonalInfo extends State<PersonalInfo>{
                     maxLines: 1,
                     autofocus: false,
                     enabled: false,
-                    controller: userBloc.dobController,
+                    controller: _dobController,
                     decoration: new InputDecoration(
                       hintText: hint,
                       icon: new Icon(
@@ -360,10 +371,10 @@ class _PersonalInfo extends State<PersonalInfo>{
                     icon: Icon(Icons.calendar_today, color: Colors.white),
                     onPressed: () async {
                       // Format date to the appropriate format
-                      DateTime tempDate = new DateFormat(DATE_FORMAT).parse(userBloc.dobController?.text);
+                      DateTime tempDate = ["", null].contains(personalBloc.dobController?.text) ? DateTime.now() : new DateFormat(DATE_FORMAT).parse(personalBloc.dobController?.text);
                       DateTime selectedDate = await showDatePicker(
                         context: context,
-                        initialDate: (userBloc.dobController?.text == null) ? DateTime.now() : tempDate,//DateTime.now(),//
+                        initialDate: tempDate,
                         firstDate: DateTime(1920),
                         lastDate: DateTime(2030),
                         builder: (BuildContext context, Widget child) {
@@ -373,51 +384,52 @@ class _PersonalInfo extends State<PersonalInfo>{
                           );
                         },
                       );
-                      userBloc?.dobController?.text = DateFormat(DATE_FORMAT).format(selectedDate);
+                      personalBloc?.dobController?.text = selectedDate == null ? DateFormat(DATE_FORMAT).format(tempDate) : DateFormat(DATE_FORMAT).format(selectedDate);
                   })),
                 ],
               )
             );
       }); 
     }
-  
+
     Widget showGenderDropDown() {
       return 
         Consumer<UserBloc>(
-          builder: (context, userBloc, child) {
-            return showDropDownButton('Select', ['male', 'female'], userBloc.genderController);
+          builder: (context, personalBloc, child) {
+            return showDropDownButton('Select', ['male', 'female'], personalBloc.genderController);
         });
     }
   
     Widget showRaceDropDown() {
       return 
         Consumer<UserBloc>(
-          builder: (context, userBloc, child) {
-            return showConsumerDropDownButton('Select', ['chinese', 'malay', 'indian', 'other']);
+          builder: (context, personalBloc, child) {
+            // return showConsumerDropDownButton('Select', ['chinese', 'malay', 'indian', 'other']);
+            return showDropDownButton('Select', ['chinese', 'malay', 'indian', 'other'], personalBloc.raceController);
         });
     }
   
     // Widget showOccupationDropDown() {
     //   return 
-    //     Consumer<UserBloc>(
-    //       builder: (context, userBloc, child) {
-    //         return showDropDownButton('Select', ['Professional', 'Other'], userBloc.user.occupation);
+    //     Consumer<personalBloc>(
+    //       builder: (context, personalBloc, child) {
+    //         return showDropDownButton('Select', ['Professional', 'Other'], personalBloc.user.occupation);
     //     });
     // }
   
-  // userBloc.user?.gender == null ? null : userBloc.user.gender,
+  // personalBloc.user?.gender == null ? null : personalBloc.user.gender,
   
   Widget showConsumerDropDownButton(String hint, List<String> items) {
       return  
         StreamBuilder<String>(
           stream: _raceStreamController.stream,
           builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-          // (context, userBloc, child) {
+          // (context, personalBloc, child) {
 
             if (snapshot.hasError)
               return Text('Error: ${snapshot.error}');
   
-            // int index = items.indexOf(userBloc.user.race);
+            // int index = items.indexOf(personalBloc.user.race);
             // if (index > -1)
             //     selectedValue = items[index];
   
@@ -433,26 +445,33 @@ class _PersonalInfo extends State<PersonalInfo>{
                 );
               }).toList(),
               validator: (value) => value == null ? 'field required' : null,
-              onChanged: (value) {selectedValue = value;},
+              onChanged: (value) {
+                selectedValue = value;
+                _formKey.currentState.validate();
+                },
             );
           });
     }
   
     Widget showDropDownButton(String hint, List<String> items, TextEditingController controller) {
       return DropdownButtonFormField<String>(
-              value: [""].contains(controller.text) ? items[0] : items[1],
-              hint: new Text(hint,
-                textAlign: TextAlign.center),
-              isExpanded: true,
-              items: items.map((String value) {
-                return new DropdownMenuItem<String>(
-                  child: new Text(value),
-                  value: value
-                );
-              }).toList(),
-              validator: (value) => value == null ? 'field required' : null,
-              onChanged: (value) =>controller.text = value,
-            );
+        // value: [""].contains(controller.text) ? items[0] : items[1],
+        hint: new Text(hint,
+          textAlign: TextAlign.center),
+        isExpanded: true,
+        items: items.map((String value) {
+          return new DropdownMenuItem<String>(
+            child: new Text(toBeginningOfSentenceCase(value)),
+            value: value
+          );
+        }).toList(),
+        validator: (value) => value == null ? 'field required' : null,
+        onChanged: (value) {
+          controller.text = value;
+          _formKey.currentState.validate();
+        },
+        onSaved: (value) => controller.text = value,
+      );
     }
   
     // Hacky way of ensuring left row and right row matches in height
@@ -477,9 +496,9 @@ class _PersonalInfo extends State<PersonalInfo>{
     }
   
     Widget showHiddenTextField(TextEditingController controller) {
-      return Opacity(opacity: 0.0, child: new Padding(
+      return Opacity(opacity: 1.0, child: new Padding(
                 padding: const EdgeInsets.only(
-                  left: 16.0,
+                  left: 0.0,
                 ),
                 child: TextFormField(
                     controller: controller,
@@ -503,9 +522,10 @@ class _PersonalInfo extends State<PersonalInfo>{
   
     Widget showNavigationButton(bool isBack) {
       IconData iconData = isBack ? Icons.arrow_back_ios : Icons.arrow_forward_ios;
-  
+      
       return 
-        Container(
+      Consumer<UserBloc>(builder: (context, personalBloc, child) {
+        return Container(
           decoration: 
             BoxDecoration(
               color: BLUE_ICON_BUTTON,
@@ -518,35 +538,38 @@ class _PersonalInfo extends State<PersonalInfo>{
                 if (!isBack) {
                   if (_formKey.currentState.validate()) {
                     // If the form is valid, pass User data to next screen.
-                    
+                    _formKey.currentState.save();
+                    // Save data before passing to next screen
+                    personalBloc.saveUserData();
+                    // Show next screen along with passing the data
+                    Navigator.pushNamed(
+                      context,
+                      '/address',
+                       arguments: Provider.of<UserBloc>(context, listen: false).userData);
                   }
+                } else {
+                  Navigator.pop(context);
                 }
               })
-      );
+        );
+      });
     }
   
     Widget showMsg() {
       return 
         Consumer<UserBloc>(
-          builder: (context, userBloc, child) {
+          builder: (context, personalBloc, child) {
             
-            // Set up controller value
-            if (userBloc.user != null) {
-              // _nameController.value = new TextEditingValue(text: userBloc.user.name);
-              // _nameController.text = userBloc.user.name;
-              // _occupationController.text = userBloc.user.occupation;
-            }
-  
-            if (userBloc.msg != "User not found.")
-              helper.displayToast(userBloc.msg);
-            if (userBloc.errorMsg != "" && userBloc.errorMsg != "User not found.")
-              helper.displayToast(userBloc.errorMsg);
+            if (personalBloc.msg != "User not found.")
+              helper.displayToast(personalBloc.msg);
+            if (personalBloc.errorMsg != "" && personalBloc.errorMsg != "User not found.")
+              helper.displayToast(personalBloc.errorMsg);
             
             return Container();
         });
       }
   
-    Widget drawCancelButton(context) {
+    Widget drawCancelButton() {
       return
         Container(padding: const EdgeInsets.only(left: 0, top: 0, right: 60, bottom: 0),
             alignment: Alignment.centerRight,
@@ -554,12 +577,12 @@ class _PersonalInfo extends State<PersonalInfo>{
               IconButton(
                 icon: Image(image: AssetImage('assets/images/cancel.png'), color: Colors.red),
                 onPressed: () {
-                  navigateToRoot(context);
+                  navigateToRoot();
                 }),
         );
     }
   
-    void navigateToRoot(context) {
+    void navigateToRoot() {
       Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
     }
   

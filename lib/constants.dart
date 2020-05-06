@@ -5,6 +5,9 @@ import 'dart:ui';
 const String AUTH_KEY="AUTH_KEY";
 const String ERROR_UNAUTHORISED="UNAUTHORISED";
 const String DATE_FORMAT="dd / MM / yyyy";
+const String DATE_ISO_8601_FORMAT="yyyy-MM-dd";
+
+const String ERROR_NULL_RESPONSE="Something went wrong, please try again later.";
 
 const BLACK_TEXT = const Color(0xFF231D1D);
 const BLUE_ENGLISH = const Color(0xFF7DB9DB);
@@ -15,5 +18,6 @@ const BLACK_HEADER_HIGHLIGHT = const Color(0xFF5A668E);
 const BLACK_HEADER_DISABLED = const Color.fromARGB(35, 29, 29, 0);
 const BLUE_INPUT_BORDER = const Color(0xFF6D83BB);
 const BLUE_ICON_BUTTON = const Color(0xFF84BDDD);
+const PURPLE_THEME = const Color(0xFF3F4EA7);
 // #239E79
 // #E58046

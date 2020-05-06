@@ -1,16 +1,35 @@
 import 'dart:developer';
 
+import 'package:camera/camera.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:easy_localization_loader/easy_localization_loader.dart';
 import 'package:flutter/material.dart';
-import 'package:meet_queue_volunteer/ui/language_page.dart';
-import 'package:meet_queue_volunteer/ui/login_page.dart';
+import 'package:meet_queue_volunteer/ui/language_screen.dart';
+import 'package:meet_queue_volunteer/ui/photo_screen.dart';
 import 'package:meet_queue_volunteer/ui/root_page.dart';
 
-import 'ui/personal_info_page.dart';
+import 'ui/address_screen.dart';
+import 'ui/login_screen.dart';
+import 'ui/personal_info_screen.dart';
 
-void main() => runApp(
-  EasyLocalization(
+var firstCamera;
+
+Future<void> main() async {
+  // Ensure that plugin services are initialized so that `availableCameras()`
+  // can be called before `runApp()`
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Obtain a list of the available cameras on the device.
+  final cameras = await availableCameras();
+
+  // Get a specific camera from the list of available cameras.
+  if (cameras.length > 1)
+    firstCamera = cameras[1];
+  else 
+    firstCamera = cameras.first;
+
+  runApp(
+    EasyLocalization(
     child: MyApp(),
     supportedLocales: [
       // English
@@ -25,6 +44,7 @@ void main() => runApp(
     path: 'assets/langs/langs.csv',
     assetLoader: CsvAssetLoader()
   ));
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -41,23 +61,21 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/',
+      initialRoute: PhotoScreen.routeName,//'/',
       routes: {
         // When navigating to the "/" route, build the FirstScreen widget.
         '/': (context) => RootPage(),
         // When navigating to the "/second" route, build the SecondScreen widget.
-        '/login': (context) => LoginPage(),
-        '/language': (context) => LanguagePage(),
+        '/login': (context) => LoginScreen(),
+        '/language': (context) => LanguageScreen(),
         // Automatically dispose it when ChangeNotifierProvider is removed from the widget tree.
-        '/personal_info': (context) => PersonalInfo(),
+        '/personal_info': (context) => PersonalInfoScreen(),
+        AddressScreen.routeName: (context) => AddressScreen(),
+        PhotoScreen.routeName: (context) => PhotoScreen(camera: firstCamera),
       },
     );
   }
 }
-
-void logoutCallback(context) {
-    Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
-  }
 
 // class MyHomePage extends StatefulWidget {
 //   MyHomePage({Key key, this.title}) : super(key: key);

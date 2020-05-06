@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 
 import '../constants.dart';
 
-class LanguagePage extends StatefulWidget {
+class LanguageScreen extends StatefulWidget {
 
-  const LanguagePage();
+  const LanguageScreen();
 
   @override
-  State<StatefulWidget> createState() => new _LanguagePageState();
+  State<StatefulWidget> createState() => new _LanguageScreenState();
   
   }
   
-  class _LanguagePageState extends State<LanguagePage> {
+  class _LanguageScreenState extends State<LanguageScreen> {
    @override
     Widget build(BuildContext context) {
       return new Scaffold(
@@ -20,7 +20,7 @@ class LanguagePage extends StatefulWidget {
       
     }
   
-    void showPersonalInfoPage() {
+    void showPersonalInfoScreen() {
       Navigator.pushNamed(context, '/personal_info');
     }
   
@@ -110,7 +110,7 @@ class LanguagePage extends StatefulWidget {
             borderRadius: BorderRadius.circular(20.0),
             side: BorderSide(color: Colors.transparent)
           ),
-          onPressed: showPersonalInfoPage,
+          onPressed: showPersonalInfoScreen,
           color: btnColor,
           textColor: Colors.white,
           child: Text(

@@ -51,6 +51,7 @@ class UserData {
     String authServer;
     DateTime createdAt;
     String uid;
+    String unitNo;
 
     UserData({
         this.nric,
@@ -71,6 +72,7 @@ class UserData {
         this.authServer,
         this.createdAt,
         this.uid,
+        this.unitNo,
     });
 
     factory UserData.fromJson(Map<String, dynamic> json) => UserData(
@@ -92,6 +94,7 @@ class UserData {
         authServer: json["authServer"],
         createdAt: DateTime.parse(json["createdAt"]),
         uid: json["uid"],
+        unitNo: json["unitNo"],
     );
 
     Map<String, dynamic> toJson() => {

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:meet_queue_volunteer/bloc/login_bloc.dart';
 import 'package:meet_queue_volunteer/helper.dart';
-import 'package:meet_queue_volunteer/ui/language_page.dart';
+import 'package:meet_queue_volunteer/ui/language_screen.dart';
 import 'package:provider/provider.dart';
 
-import 'login_page.dart';
+import 'login_screen.dart';
 
 enum AuthStatus {
   NOT_DETERMINED,
@@ -87,16 +87,16 @@ class _RootPageState extends State<RootPage> {
           child: 
           Consumer<LoginBloc>(builder: (context, bloc, child) {
             if (bloc.hasLoggedIn)
-              return new LanguagePage();
+              return new LanguageScreen();
             else 
               return child;
             },
-            child: new LoginPage()
+            child: new LoginScreen()
           )
         );
         break;
       case AuthStatus.LOGGED_IN:
-      return new LanguagePage();
+      return new LanguageScreen();
         // if (_userId.length > 0 && _userId != null) {
           // return new HomePage(
           //   items: List<ListItem>.generate(

@@ -51,6 +51,33 @@ class ApiBaseHelper {
       return responseJson;
   }
 
+  Future<dynamic> patch(String url, dynamic body) async {
+      var responseJson;
+      var reqBody = json.encode(body);
+      String token = await helper.getAuthToken();
+      
+      try {
+        final response = await http.patch(
+          _baseUrl + url, 
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body: reqBody
+        );
+        responseJson = _returnResponse(response);
+
+        // If user is unauthorised or jwt expired, remove saved token. 
+        if (responseJson == ERROR_UNAUTHORISED) {
+          await helper.setAuthToken("");
+          throw UnauthorisedException(ERROR_UNAUTHORISED);
+        }
+      } on SocketException {
+        throw FetchDataException('No Internet connection');
+      }
+      return responseJson;
+  }
+
   dynamic _returnResponse(http.Response response) {    
     switch (response.statusCode) {
       case 200:

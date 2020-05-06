@@ -7,16 +7,16 @@ import 'package:meet_queue_volunteer/services/user_repository.dart';
 import 'package:provider/provider.dart';
 
 
-class LoginPage extends StatefulWidget {
+class LoginScreen extends StatefulWidget {
 
-LoginPage();
+LoginScreen();
 
   @override
-  State<StatefulWidget> createState() => new _LoginPageState();
+  State<StatefulWidget> createState() => new _LoginScreenState();
 
 }
 
-class _LoginPageState extends State<LoginPage>{
+class _LoginScreenState extends State<LoginScreen>{
 
   UserRepository userRepository = new UserRepository();
 
