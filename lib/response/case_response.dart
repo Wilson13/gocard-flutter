@@ -90,7 +90,6 @@ class CaseData {
         "refId": refId,
         "location": location,
         "queueNo": queueNo,
-        "createdAt": createdAt.toIso8601String(),
         "uid": uid,
         "__v": v,
     };

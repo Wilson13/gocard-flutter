@@ -1,5 +1,10 @@
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:meet_queue_volunteer/api_base_helper.dart';
+import 'package:meet_queue_volunteer/response/case_response.dart';
+import 'package:meet_queue_volunteer/response/photo_get_response.dart';
+import 'package:meet_queue_volunteer/response/photo_upload_response.dart';
 import 'package:meet_queue_volunteer/response/user_response.dart';
 
 import '../constants.dart';
@@ -27,6 +32,11 @@ class UserRepository {
 
     final response = await _apiHelper.post("user/search", reqBody);
     return UserResponse.fromJson(response);
+  }
+
+  Future<PhotoGetResponse> getUserPhoto(String uid) async{
+    final response = await _apiHelper.get("user/"+ uid +"/photo");
+    return PhotoGetResponse.fromJson(response);
   }
 
   Future<UserResponse> updateUser(UserData userData) async{
@@ -72,6 +82,40 @@ class UserRepository {
 
       final response = await _apiHelper.post("user", reqBody);
       return UserResponse.fromJson(response);
+
+    } else {
+      return null;
+    }
+  }
+
+  Future<CaseResponse> createCase({UserData userData, CaseData caseData}) async{
+  
+    String uid = userData.uid;
+    if (!(["", null].contains(uid))) {
+
+      // update location (amk for now)
+      caseData.location = KIOSK_LOCATION;
+      // Convert dob into ISO 8601 format (yyyy-MM-dd) as API accepts only this format
+      String dob = DateFormat(DATE_ISO_8601_FORMAT).format(DateTime.now());
+
+      Map reqBody = caseData.toJson();
+      // Not part of CaseData because it's not returned by API
+      reqBody["whatsappCall"] = caseData.whatsappCall ? "true" : "false";
+      reqBody["date"] = dob;
+
+      final response = await _apiHelper.post("user/" + userData.uid + "/case", reqBody);
+      return CaseResponse.fromJson(response);
+
+    } else {
+      return null;
+    }
+  }
+
+  Future<PhotoUploadResponse> uploadPhoto({String uid, File photo}) async{
+  
+    if (!(["", null].contains(uid))) {
+      final response = await _apiHelper.postFile("user/" + uid + "/photo", photo);
+      return PhotoUploadResponse.fromJson(response);
 
     } else {
       return null;

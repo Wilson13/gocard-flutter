@@ -9,7 +9,7 @@ class AddressBloc {
   String errorMsg, msg;
   TextEditingController postalController, blkHseController, floorController, unitController, addressController, flatController;
 
-  UserRepository _userRepository;
+UserRepository _userRepository;
 
   AddressBloc({    
     @required this.userData,

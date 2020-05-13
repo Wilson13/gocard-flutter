@@ -3,8 +3,10 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:meet_queue_volunteer/response/app_exceptions.dart';
-
+import 'package:path/path.dart';
 import 'constants.dart';
 import 'helper.dart';
 
@@ -15,8 +17,13 @@ class ApiBaseHelper {
 
   Future<dynamic> get(String url) async {
       var responseJson;
+      String token = await helper.getAuthToken();
       try {
-        final response = await http.get(_baseUrl + url);
+        final response = await http.get(_baseUrl + url,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          });
         responseJson = _returnResponse(response);
       } on SocketException {
         throw FetchDataException('No Internet connection');
@@ -38,6 +45,42 @@ class ApiBaseHelper {
           },
           body: reqBody
         );
+        responseJson = _returnResponse(response);
+
+        // If user is unauthorised or jwt expired, remove saved token. 
+        if (responseJson == ERROR_UNAUTHORISED) {
+          await helper.setAuthToken("");
+          throw UnauthorisedException(ERROR_UNAUTHORISED);
+        }
+      } on SocketException {
+        throw FetchDataException('No Internet connection');
+      }
+      return responseJson;
+  }
+
+  Future<dynamic> postFile(String url, File file) async {
+      var stream = new http.ByteStream(Stream.castFrom(file.openRead()));
+      var length = await file.length();
+      var uri = Uri.parse(url);
+      var responseJson;
+      String token = await helper.getAuthToken();
+      Map<String, String> headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          };
+      
+      var request = new http.MultipartRequest("POST", uri);
+      var multipartFile = new http.MultipartFile('file', stream, length,
+          filename: basename(file.path),
+          contentType: new MediaType('image', 'png'));
+
+      
+      request.headers.addAll(headers);
+      request.files.add(multipartFile);
+      try {
+
+        final StreamedResponse streamedResponse = await request.send();
+        var response = await http.Response.fromStream(streamedResponse);
         responseJson = _returnResponse(response);
 
         // If user is unauthorised or jwt expired, remove saved token. 
@@ -81,7 +124,6 @@ class ApiBaseHelper {
   dynamic _returnResponse(http.Response response) {    
     switch (response.statusCode) {
       case 200:
-        log("200");
         log(response.body.toString());
         // return json.decode(
         return json.decode(response.body.toString());

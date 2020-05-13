@@ -116,5 +116,6 @@ class UserData {
         "authServer": authServer,
         "createdAt": createdAt.toIso8601String(),
         "uid": uid,
+        "unitNo": unitNo,
     };
 }

@@ -50,7 +50,9 @@ class _PersonalInfo extends State<PersonalInfoScreen>{
       return new Scaffold(
         resizeToAvoidBottomInset: false,
         resizeToAvoidBottomPadding: false,
-        body: Center(child: SingleChildScrollView(
+        body: 
+        // Center(child: 
+        SingleChildScrollView(
           reverse: true,
           child: Padding(padding: EdgeInsets.only(bottom: bottom),
             child: new GestureDetector(
@@ -64,7 +66,7 @@ class _PersonalInfo extends State<PersonalInfoScreen>{
                 child: makeBody()
               )
             )
-        ))));
+        )));
     }
     
     // void showPersonalInfoPage() {
@@ -85,26 +87,12 @@ class _PersonalInfo extends State<PersonalInfoScreen>{
           numChildController: _numChildController
           ),
         child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget> [
           // Header
-          Row(children: <Widget>[
-            SizedBox(width: 180),
-            // Progress
-            Expanded(child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget> [
-                drawHeader("Personal Information", BLACK_HEADER_HIGHLIGHT),
-                drawHeader("Address", BLACK_HEADER_DISABLED),
-                drawHeader("Photo", BLACK_HEADER_DISABLED),
-                drawHeader("Subject", BLACK_HEADER_DISABLED),            
-              ]
-            )), 
-            // Cancel button
-            SizedBox(width: 180, child: drawCancelButton())
-          ]),
+          helper.headers(Headers.PERSONAL_INFO, navigateToRoot),
           // Content column with four rows inside
-          // Expanded(child: // Disable this if centered is required
             Container(
               alignment: Alignment.center,
               padding: const EdgeInsets.only(left: 60, top: 64, right: 60, bottom: 0),
@@ -125,42 +113,7 @@ class _PersonalInfo extends State<PersonalInfoScreen>{
         ]
       ));
     }
-  
-    Widget drawHeader(String name, Color color) {
-      return 
-        Center(
-          child: 
-            Padding(
-              padding: const EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 0),
-              child: Text(
-                name,
-                style: TextStyle(
-                  color: color, 
-                  fontFamily: 'Circular Std',
-                  fontSize: 24,
-                  fontStyle: FontStyle.normal,
-                  fontWeight: FontWeight.w400
-                ),
-      )));
-    }
-  
-    BoxDecoration myBoxDecoration() {
-      return BoxDecoration(
-        border: Border.all(
-          color: BLUE_INPUT_BORDER,
-          width: 1.0
-        ),
-        borderRadius: BorderRadius.all(
-            Radius.circular(5.0) 
-        ),
-      );
-    }
-  
-    OutlineInputBorder textFieldDecoration() {
-      return OutlineInputBorder(
-        borderSide: const BorderSide(color: BLUE_INPUT_BORDER, width: 1),
-      );
-    } 
+
   
     Widget firstRow() {
       return Container(width: double.infinity, // Match parent
@@ -259,10 +212,10 @@ class _PersonalInfo extends State<PersonalInfoScreen>{
               autofocus: false,
               decoration: new InputDecoration(
                 hintText: hint,
-                enabledBorder: textFieldDecoration(),
-                focusedBorder: textFieldDecoration(),
-                border: textFieldDecoration(),
-                errorBorder: textFieldDecoration(),
+                enabledBorder: helper.textFieldDecoration(),
+                focusedBorder: helper.textFieldDecoration(),
+                border: helper.textFieldDecoration(),
+                errorBorder: helper.textFieldDecoration(),
                 disabledBorder: InputBorder.none,
               ),
               validator: (value) {
@@ -292,10 +245,10 @@ class _PersonalInfo extends State<PersonalInfoScreen>{
                 autofocus: false,
                 decoration: new InputDecoration(
                   hintText: hint,
-                  enabledBorder: textFieldDecoration(),
-                  focusedBorder: textFieldDecoration(),
-                  border: textFieldDecoration(),
-                  errorBorder: textFieldDecoration(),
+                  enabledBorder: helper.textFieldDecoration(),
+                  focusedBorder: helper.textFieldDecoration(),
+                  border: helper.textFieldDecoration(),
+                  errorBorder: helper.textFieldDecoration(),
                   disabledBorder: InputBorder.none,
                 ),
                 validator: (value) {
@@ -339,7 +292,7 @@ class _PersonalInfo extends State<PersonalInfoScreen>{
         Consumer<PersonalInfoBloc>(
           builder: (context, personalBloc, child) {
             return Container(padding: const EdgeInsets.only(left: 15, top: 0, right: 0, bottom: 0),
-              decoration: myBoxDecoration(),
+              decoration: helper.dateBoxDecoration(),
               child:
               Stack(
                 alignment: Alignment.centerRight, 
@@ -505,10 +458,10 @@ class _PersonalInfo extends State<PersonalInfoScreen>{
                     maxLines: 1,
                     autofocus: false,
                     decoration: new InputDecoration(
-                      enabledBorder: textFieldDecoration(),
-                      focusedBorder: textFieldDecoration(),
-                      border: textFieldDecoration(),
-                      errorBorder: textFieldDecoration(),
+                      enabledBorder: helper.textFieldDecoration(),
+                      focusedBorder: helper.textFieldDecoration(),
+                      border: helper.textFieldDecoration(),
+                      errorBorder: helper.textFieldDecoration(),
                       disabledBorder: InputBorder.none,
                     ),
                     validator: (value) {
@@ -548,6 +501,7 @@ class _PersonalInfo extends State<PersonalInfoScreen>{
                        arguments: Provider.of<PersonalInfoBloc>(context, listen: false).userData);
                   }
                 } else {
+                  // Back button
                   Navigator.pop(context);
                 }
               })

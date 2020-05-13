@@ -2,9 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:meet_queue_volunteer/bloc/subject_bloc.dart';
-import 'package:meet_queue_volunteer/response/case_response.dart';
 import 'package:meet_queue_volunteer/response/user_response.dart';
 import 'package:meet_queue_volunteer/ui/photo_screen.dart';
+import 'package:meet_queue_volunteer/ui/summary_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:meet_queue_volunteer/helper.dart';
 
@@ -22,11 +22,19 @@ class SubjectScreen extends StatefulWidget {
   
 class _SubjectScreen extends State<SubjectScreen>{
 
+  final _formKey = GlobalKey<FormState>();
+  Map<String, Object> passSubjectData;
+  UserData _userData;
+  PhotoModel _photoModel;
+  bool _enableWhatsApp = false;
+
+  final Helper helper = new Helper();
+
   final TextEditingController _subjectController = new TextEditingController();
   final TextEditingController _languageController = new TextEditingController();
   final TextEditingController _descriptionController = new TextEditingController();
   final TextEditingController _phoneController = new TextEditingController();
-  bool _allowedWhatsapp = false;
+
   // final String token;
   final RegExp postalExp = new RegExp(
     r"^\d{6}$",
@@ -34,22 +42,8 @@ class _SubjectScreen extends State<SubjectScreen>{
     multiLine: false,
   );
 
-  final _formKey = GlobalKey<FormState>();
-  CaseData caseData;
-  // String selectedValue;
-
-  final Helper helper = new Helper();
-
-  String selectedValue;
-
   void updateControllers() {
-    if (caseData != null) {
-    _subjectController.text = caseData.subject;
-    _languageController.text = caseData.language;
-    _descriptionController.text = caseData.description;
-    _allowedWhatsapp = caseData.whatsappCall;
-    }
-    _phoneController.text = "12345678";
+    _phoneController.text = _userData.phone;
   }
 
   @override
@@ -68,7 +62,10 @@ class _SubjectScreen extends State<SubjectScreen>{
       
     // Extract the arguments from the current ModalRoute settings and cast
     // them as UserData.
-    caseData = ModalRoute.of(context).settings.arguments;
+    // caseData = ModalRoute.of(context).settings.arguments;
+    final Map<String, Object> receivedData = ModalRoute.of(context).settings.arguments;
+    _userData = receivedData["userData"];
+    _photoModel = receivedData["photoModel"];
 
     final bottom = MediaQuery.of(context).viewInsets.bottom;
     return new Scaffold(
@@ -94,7 +91,6 @@ class _SubjectScreen extends State<SubjectScreen>{
   Widget makeBody() {
     return Provider<SubjectBloc>(
       create: (context) => SubjectBloc(
-        caseData: caseData,
         subjectController: _subjectController,
         languageController: _languageController,
         descriptionController: _descriptionController,
@@ -110,10 +106,11 @@ class _SubjectScreen extends State<SubjectScreen>{
             Expanded(child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget> [
-                drawHeader("Personal Information", BLACK_HEADER_DISABLED),
-                drawHeader("Address", BLACK_HEADER_HIGHLIGHT),
-                drawHeader("Photo", BLACK_HEADER_DISABLED),
-                drawHeader("Subject", BLACK_HEADER_DISABLED),            
+                drawHeader("Personal Information", HEADER_DISABLED),
+                drawHeader("Address", HEADER_DISABLED),
+                drawHeader("Photo", HEADER_DISABLED),
+                drawHeader("Subject", HEADER_HIGHLIGHT),
+                drawHeader("Summary", HEADER_DISABLED),            
               ]
             )), 
             // Cancel button
@@ -160,12 +157,6 @@ class _SubjectScreen extends State<SubjectScreen>{
     )));
   }
 
-  OutlineInputBorder textFieldDecoration() {
-    return OutlineInputBorder(
-      borderSide: const BorderSide(color: BLUE_INPUT_BORDER, width: 1),
-    );
-  } 
-
   Widget firstRow() {
     return Container(width: double.infinity, // Match parent
         padding: const EdgeInsets.only(left: 60, top: 0, right: 0, bottom: 0),
@@ -196,10 +187,10 @@ class _SubjectScreen extends State<SubjectScreen>{
             SizedBox(height: 10),
             CheckboxListTile(
               title: Text("Receive audio/video calls on WhatsApp"),
-              value: _allowedWhatsapp,
+              value: _enableWhatsApp,
               onChanged: (value) {
                 setState((){
-                _allowedWhatsapp = value;
+                _enableWhatsApp = value;
               });
               } ,
               controlAffinity: ListTileControlAffinity.leading,  //  <-- leading Checkbox
@@ -239,11 +230,11 @@ class _SubjectScreen extends State<SubjectScreen>{
             enabled: enabled,
             decoration: new InputDecoration(
               hintText: hint,
-              enabledBorder: textFieldDecoration(),
-              focusedBorder: textFieldDecoration(),
-              border: textFieldDecoration(),
-              errorBorder: textFieldDecoration(),
-              disabledBorder: textFieldDecoration(),
+              enabledBorder: helper.textFieldDecoration(),
+              focusedBorder: helper.textFieldDecoration(),
+              border: helper.textFieldDecoration(),
+              errorBorder: helper.textFieldDecoration(),
+              disabledBorder: helper.textFieldDecoration(),
             ),
             validator: (value) {
               if (isRequired && value.isEmpty) {
@@ -266,10 +257,10 @@ class _SubjectScreen extends State<SubjectScreen>{
             autofocus: false,
             decoration: new InputDecoration(
               hintText: hint,
-              enabledBorder: textFieldDecoration(),
-              focusedBorder: textFieldDecoration(),
-              border: textFieldDecoration(),
-              errorBorder: textFieldDecoration(),
+              enabledBorder: helper.textFieldDecoration(),
+              focusedBorder: helper.textFieldDecoration(),
+              border: helper.textFieldDecoration(),
+              errorBorder: helper.textFieldDecoration(),
               disabledBorder: InputBorder.none,
             ),
             validator: (value) {
@@ -292,14 +283,14 @@ class _SubjectScreen extends State<SubjectScreen>{
             autofocus: false,
             decoration: new InputDecoration(
               hintText: hint,
-              enabledBorder: textFieldDecoration(),
-              focusedBorder: textFieldDecoration(),
-              border: textFieldDecoration(),
-              errorBorder: textFieldDecoration(),
+              enabledBorder: helper.textFieldDecoration(),
+              focusedBorder: helper.textFieldDecoration(),
+              border: helper.textFieldDecoration(),
+              errorBorder: helper.textFieldDecoration(),
               disabledBorder: InputBorder.none,
             ),
             validator: (value) {
-              if (isRequired && !postalExp.hasMatch(value)) {
+              if (isRequired && value.isEmpty) {
                 return 'Postal code has to be 6-digit.';
               }
               return null;
@@ -345,37 +336,27 @@ class _SubjectScreen extends State<SubjectScreen>{
               if (!isBack) {
                 // No error with inputs
                 if (_formKey.currentState.validate()) {
-                  if (subjectBloc.caseResponse == null) {
-
-                  }
-                  // try {
-                  // If the form is valid and uid exists, update user.
-                  // if (!(["", null, false, 0]).contains(SubjectBloc.userData.uid)) {
-                  //   _formKey.currentState.save();
-                  //   updateOrCreateResponse = await SubjectBloc.updateUser();
-                  // } 
-                  // // If the form is valid and uid doesn't exist, create user.
-                  // else {
-                  //   updateOrCreateResponse = await SubjectBloc.createUser();
-                  // }
-
-                  // Display response
-                  // if (updateOrCreateResponse == null)
-                  //     helper.displayToast(ERROR_NULL_RESPONSE);
-                  //   else {
-                  //     helper.displayToast(updateOrCreateResponse.message);
-                  //     Navigator.of(context).pushNamedAndRemoveUntil(PhotoScreen.routeName, (Route<dynamic> route) => false);
-                  //   }
-                  // } catch(e) {
-                  //     // If error is unauthorised
-                  //     if (e.toString() == ERROR_UNAUTHORISED)
-                  //       navigateToRoot();
-                  //   }
+                  // Pass both CaseData and UserData to summary page
+                  SubjectBloc subjectBloc = Provider.of<SubjectBloc>(context, listen: false);
+                  subjectBloc.saveCaseData(_enableWhatsApp);
+                  passSubjectData = { 
+                    "userData": _userData, // no need to store UserData in SubjectBloc as it doesn't get changed in this screen
+                    "caseData": Provider.of<SubjectBloc>(context, listen: false).caseData,
+                    "photoModel": _photoModel
+                  };
+                  Navigator.pushNamed(
+                    context, 
+                    SummaryScreen.routeName, 
+                    arguments: passSubjectData
+                  );
                 }
-              } 
-              // Back button
-              else {
-                Navigator.pop(context);
+              } else {
+                // Instead of popping, push PhotoScreen so camera can be initialized and disposed properly.
+                // Navigator.pop(context);
+                Navigator.pushReplacementNamed(
+                  context, 
+                  PhotoScreen.routeName, 
+                  arguments: _userData);
               }
             })
       );

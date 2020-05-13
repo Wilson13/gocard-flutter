@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:meet_queue_volunteer/bloc/address_bloc.dart';
@@ -76,7 +75,7 @@ class _AddressScreen extends State<AddressScreen>{
     return new Scaffold(
       resizeToAvoidBottomInset: false,
       resizeToAvoidBottomPadding: false,
-      body: Center(child: SingleChildScrollView(
+      body: SingleChildScrollView(
         reverse: true,
         child: Padding(padding: EdgeInsets.only(bottom: bottom),
           child: new GestureDetector(
@@ -90,7 +89,7 @@ class _AddressScreen extends State<AddressScreen>{
               child: makeBody()
             )
           )
-      ))));
+      )));
   }
     
   Widget makeBody() {
@@ -107,24 +106,9 @@ class _AddressScreen extends State<AddressScreen>{
       child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget> [
-        // Header
-        Row(children: <Widget>[
-          SizedBox(width: 180),
-          // Progress
-          Expanded(child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget> [
-              drawHeader("Personal Information", BLACK_HEADER_DISABLED),
-              drawHeader("Address", BLACK_HEADER_HIGHLIGHT),
-              drawHeader("Photo", BLACK_HEADER_DISABLED),
-              drawHeader("Subject", BLACK_HEADER_DISABLED),            
-            ]
-          )), 
-          // Cancel button
-          SizedBox(width: 180, child: drawCancelButton(context))
-        ]),
+        // Headers
+        helper.headers(Headers.ADDRESS, navigateToRoot),
         // Content column with four rows inside
-        // Expanded(child: // Disable this if centered is required
           Container(
             alignment: Alignment.center,
             padding: const EdgeInsets.only(left: 60, top: 64, right: 60, bottom: 0),
@@ -144,42 +128,6 @@ class _AddressScreen extends State<AddressScreen>{
           )),
       ]
     ));
-  }
-
-  Widget drawHeader(String name, Color color) {
-    return 
-      Center(
-        child: 
-          Padding(
-            padding: const EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 0),
-            child: Text(
-              name,
-              style: TextStyle(
-                color: color, 
-                fontFamily: 'Circular Std',
-                fontSize: 24,
-                fontStyle: FontStyle.normal,
-                fontWeight: FontWeight.w400
-              ),
-    )));
-  }
-
-  BoxDecoration myBoxDecoration() {
-    return BoxDecoration(
-      border: Border.all(
-        color: BLUE_INPUT_BORDER,
-        width: 1.0
-      ),
-      borderRadius: BorderRadius.all(
-          Radius.circular(5.0) 
-      ),
-    );
-  }
-
-  OutlineInputBorder textFieldDecoration() {
-    return OutlineInputBorder(
-      borderSide: const BorderSide(color: BLUE_INPUT_BORDER, width: 1),
-    );
   } 
 
   Widget firstRow() {
@@ -265,10 +213,10 @@ class _AddressScreen extends State<AddressScreen>{
             autofocus: false,
             decoration: new InputDecoration(
               hintText: hint,
-              enabledBorder: textFieldDecoration(),
-              focusedBorder: textFieldDecoration(),
-              border: textFieldDecoration(),
-              errorBorder: textFieldDecoration(),
+              enabledBorder: helper.textFieldDecoration(),
+              focusedBorder: helper.textFieldDecoration(),
+              border: helper.textFieldDecoration(),
+              errorBorder: helper.textFieldDecoration(),
               disabledBorder: InputBorder.none,
             ),
             validator: (value) {
@@ -291,10 +239,10 @@ class _AddressScreen extends State<AddressScreen>{
             autofocus: false,
             decoration: new InputDecoration(
               hintText: hint,
-              enabledBorder: textFieldDecoration(),
-              focusedBorder: textFieldDecoration(),
-              border: textFieldDecoration(),
-              errorBorder: textFieldDecoration(),
+              enabledBorder: helper.textFieldDecoration(),
+              focusedBorder: helper.textFieldDecoration(),
+              border: helper.textFieldDecoration(),
+              errorBorder: helper.textFieldDecoration(),
               disabledBorder: InputBorder.none,
             ),
             validator: (value) {
@@ -305,112 +253,6 @@ class _AddressScreen extends State<AddressScreen>{
             },
             onSaved: (value) => controller.text = value,
       ));
-  }
-
-  Widget showDateSelector(String hint) {
-    return 
-      Consumer<AddressBloc>(
-        builder: (context, userBloc, child) {
-          return Container(padding: const EdgeInsets.only(left: 15, top: 0, right: 0, bottom: 0),
-            decoration: myBoxDecoration(),
-            child:
-            Stack(
-              alignment: Alignment.centerRight, 
-              children: <Widget>[
-                TextFormField(
-                  maxLines: 1,
-                  autofocus: false,
-                  enabled: false,
-                  controller: userBloc.unitController,
-                  decoration: new InputDecoration(
-                    hintText: hint,
-                    icon: new Icon(
-                      Icons.calendar_today,
-                      color: Colors.grey,
-                    ),
-                    border: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                    disabledBorder: InputBorder.none,
-                )),
-                Container(
-                  decoration: 
-                    BoxDecoration(
-                      color: BLUE_ICON_BUTTON,
-                      borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                    ),
-                  child: IconButton(
-                  icon: Icon(Icons.calendar_today, color: Colors.white),
-                  onPressed: () async {
-                    // Format date to the appropriate format
-                    DateTime tempDate = new DateFormat(DATE_FORMAT).parse(userBloc.unitController?.text);
-                    DateTime selectedDate = await showDatePicker(
-                      context: context,
-                      initialDate: (userBloc.unitController?.text == null) ? DateTime.now() : tempDate,//DateTime.now(),//
-                      firstDate: DateTime(1920),
-                      lastDate: DateTime(2030),
-                      builder: (BuildContext context, Widget child) {
-                        return Theme(
-                          data: ThemeData.dark(),
-                          child: child,
-                        );
-                      },
-                    );
-                    userBloc?.unitController?.text = DateFormat(DATE_FORMAT).format(selectedDate);
-                })),
-              ],
-            )
-          );
-    }); 
-  }
-
-  Widget showConsumerDropDownButton(String hint, List<String> items) {
-      return  
-        StreamBuilder<String>(
-          stream: _raceStreamController.stream,
-          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-          // (context, userBloc, child) {
-
-            if (snapshot.hasError)
-              return Text('Error: ${snapshot.error}');
-
-            // int index = items.indexOf(userBloc.user.race);
-            // if (index > -1)
-            //     selectedValue = items[index];
-
-            return new DropdownButtonFormField<String>(
-              value: snapshot.data,//index > -1 ? items[index] : null,
-              hint: new Text(hint,
-                textAlign: TextAlign.center),
-              isExpanded: true,
-              items: items.map((String value) {
-                return new DropdownMenuItem<String>(
-                  child: new Text(value),
-                  value: value
-                );
-              }).toList(),
-              validator: (value) => value == null ? 'field required' : null,
-              onChanged: (value) {selectedValue = value;},
-            );
-          });
-    }
-
-  Widget showDropDownButton(String hint, List<String> items, TextEditingController controller) {
-    return DropdownButtonFormField<String>(
-            value: [""].contains(controller.text) ? items[0] : items[1],
-            hint: new Text(hint,
-              textAlign: TextAlign.center),
-            isExpanded: true,
-            items: items.map((String value) {
-              return new DropdownMenuItem<String>(
-                child: new Text(value),
-                value: value
-              );
-            }).toList(),
-            validator: (value) => value == null ? 'field required' : null,
-            onChanged: (value) =>controller.text = value,
-          );
   }
 
   Widget showNavigationButton(bool isBack) {
@@ -433,28 +275,31 @@ class _AddressScreen extends State<AddressScreen>{
                 if (_formKey.currentState.validate()) {
                   UserResponse updateOrCreateResponse;
                   try {
-                  // If the form is valid and uid exists, update user.
-                  if (!(["", null, false, 0]).contains(addressBloc.userData.uid)) {
-                    _formKey.currentState.save();
-                    updateOrCreateResponse = await addressBloc.updateUser();
-                  } 
-                  // If the form is valid and uid doesn't exist, create user.
-                  else {
-                    updateOrCreateResponse = await addressBloc.createUser();
-                  }
-
-                  // Display response
-                  if (updateOrCreateResponse == null)
-                      helper.displayToast(ERROR_NULL_RESPONSE);
+                    // If the form is valid and uid exists, update user.
+                    if (!(["", null, false, 0]).contains(addressBloc.userData.uid)) {
+                      _formKey.currentState.save();
+                      updateOrCreateResponse = await addressBloc.updateUser();
+                    } 
+                    // If the form is valid and uid doesn't exist, create user.
                     else {
-                      helper.displayToast(updateOrCreateResponse.message);
-                      Navigator.of(context).pushNamedAndRemoveUntil(PhotoScreen.routeName, (Route<dynamic> route) => false);
+                      updateOrCreateResponse = await addressBloc.createUser();
+                    }
+
+                    // Display response
+                    if (updateOrCreateResponse == null)
+                        helper.displayToast(ERROR_NULL_RESPONSE);
+                    else {
+                        helper.displayToast(updateOrCreateResponse.message);
+                        Navigator.pushNamed(
+                          context, 
+                          PhotoScreen.routeName, 
+                          arguments: Provider.of<AddressBloc>(context, listen: false).userData);
                     }
                   } catch(e) {
                       // If error is unauthorised
                       if (e.toString() == ERROR_UNAUTHORISED)
                         navigateToRoot();
-                    }
+                  }
                 }
               } 
               // Back button
