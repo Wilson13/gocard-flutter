@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
-import 'package:http_parser/http_parser.dart';
 import 'package:meet_queue_volunteer/response/app_exceptions.dart';
 import 'package:path/path.dart';
 import 'constants.dart';

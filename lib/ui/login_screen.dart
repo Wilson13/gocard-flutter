@@ -1,17 +1,24 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_queue_volunteer/bloc/login_bloc.dart';
 import 'package:meet_queue_volunteer/response/login_otp_response.dart';
+import 'package:meet_queue_volunteer/response/login_response.dart';
 import 'package:meet_queue_volunteer/services/user_repository.dart';
 import 'package:provider/provider.dart';
+import "../extension/string_extension.dart";
+import '../constants.dart';
+import '../helper.dart';
 
 
 class LoginScreen extends StatefulWidget {
 
   static const routeName = '/login';
 
-  LoginScreen();
+  VoidCallback loginCallback;
+
+  LoginScreen({@required this.loginCallback});
 
   @override
   State<StatefulWidget> createState() => new _LoginScreenState();
@@ -25,12 +32,15 @@ class _LoginScreenState extends State<LoginScreen>{
   final _formKey = new GlobalKey<FormState>();
   String _phone, _otp;
   bool isOtp = false;
+  String defaultValue = LOCATION_ANG_MO_KIO;
+  TextEditingController locationController = new TextEditingController();
 
   LoginBloc loginBloc;
 
   @override
   void initState() {
     super.initState();
+    locationController.text = LOCATION_ANG_MO_KIO;    
   }
 
   @override
@@ -38,38 +48,8 @@ class _LoginScreenState extends State<LoginScreen>{
 
     loginBloc = Provider.of<LoginBloc>(context);
     return new Scaffold(
-      body:  
-        Stack(
-          alignment: Alignment.center,
-          children: <Widget>[
-            showForm(),
-            showCircularProgress(),
-        ],
-    ));
-  }
-
-  Widget showCircularProgress() {
-    return ChangeNotifierProvider<LoginBloc>.value(
-      value: loginBloc,
-      child: Consumer<LoginBloc>(builder: (context, loginBloc, child) {
-        if (loginBloc.isLoading) {
-          return Center(child: CircularProgressIndicator());
-        }
-        else 
-          return Container();
-        }));
-
-    // return Consumer<LoginBloc>(
-    //   builder: (context, res, child) {
-    //     if (res.isLoading) {
-    //       return Center(child: CircularProgressIndicator());
-    //     }
-    //     return Center(
-    //       child: Container(
-    //       height: 0.0,
-    //       width: 0.0,
-    //     ));
-    //   });
+      body: Center(child: showForm()),
+    );
   }
 
   Widget showLogo() {
@@ -122,6 +102,37 @@ class _LoginScreenState extends State<LoginScreen>{
         validator: (value) => value.isEmpty && !isOtp ? 'OTP can\'t be empty' : null,
         onSaved: (value) => _otp = value.trim(),
       ),
+    );
+  }
+
+  Widget showLocationDropDown(List<String> itemList) { 
+    return  Padding(
+      padding: const EdgeInsets.only(top: 15),
+      child: 
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(right: 20),
+            child: Icon(
+            Icons.place,
+            color: Colors.grey,
+            size: 20.0,
+          )),
+          Expanded(
+            child: DropdownButtonFormField<String>(
+              value: locationController.text,
+              hint: Text('Location'),
+              items: 
+                itemList
+                  .map((label) => DropdownMenuItem(
+                        child: Text(label.capitalize()),
+                        value: label,
+                  ))
+                  .toList(), 
+              onChanged: (value) { locationController.text = value; },
+          )),
+      ])
     );
   }
 
@@ -186,10 +197,8 @@ void validateAndSubmit() async {
 
   if (validateAndSave()) {
 
-    loginBloc.isLoading = true;
     // Request OTP
     if (isOtp) {
-      isOtp = false;
       // For now, can't find a better way to handle api calls without try-catch in UI.
       // FutureBuilder has snapshot, but requires to return widget which is not required here.
       try {
@@ -199,8 +208,18 @@ void validateAndSubmit() async {
         showToast(err.toString());
       }
     } else {
-      // Attempt to login
-      await loginBloc.loginOtp(new KioskPhone.instantiate("65", _phone), _otp);
+      try {
+        // Attempt to login
+        LoginResponse loginRes = await loginBloc.loginOtp(new KioskPhone.instantiate("65", _phone), _otp, locationController);
+        showToast(SUCCESS_LOGIN);
+        if (loginRes.status == 200) {
+          // Login successfully
+          new Helper().setAuthToken(loginRes.loginData.accessToken);
+          widget.loginCallback();
+        }
+      } catch(err) {
+        showToast(err.toString());
+      }
     }
   }
 }
@@ -221,88 +240,6 @@ void validateAndSubmit() async {
     ));
   }
 
-  Widget handleApiResponse() {
-    // Using MultiProvider to handle two different streams
-    return ChangeNotifierProvider<LoginBloc>.value(
-      value: loginBloc,
-      child: Consumer<LoginBloc>(
-        builder: (context, bloc, child) {
-          loginBloc.isLoading = false;
-
-          if (loginBloc.otpRequested)
-            showToast(loginBloc.msg);
-          return showErrorMessage(bloc.errorMsg);         
-        }
-      )
-    );
-    }
-
-    // Widget handleLoginResponse() {
-    // // Using MultiProvider to handle two different streams
-    // return StreamProvider<ApiResponse<LoginResponse>>.value(
-    //   value: loginBloc.loginStream,
-    //   child: Consumer<ApiResponse<LoginResponse>>(
-    //     builder: (context, loginRes, child) {
-    //       if (loginRes != null) {
-    //         // Login response
-    //         if (loginRes.status == Status.ERROR) {
-    //           loginBloc.isLoading = false;
-    //           // Show error message
-    //           return showErrorMessage(loginRes.message);
-    //           } else if (loginRes.data?.status == 200) {
-    //             // Login successfully
-    //             showToast(loginRes.data?.message);
-    //             new Helper().setAuthToken(loginRes.data?.loginData?.accessToken);
-    //             widget.loginCallback();
-    //             return Container();
-    //           }
-    //         }
-    //       return Container();
-    //     }
-    //   )
-    // );
-    // }
-    
-    // return MultiProvider(
-    //   providers: [
-    //     StreamProvider<ApiResponse<LoginOtpResponse>>.value(
-    //       value: loginBloc.otpStream),
-
-    //     StreamProvider<ApiResponse<LoginResponse>>.value(
-    //       value: loginBloc.loginStream)
-    // ],
-    //   child: Consumer2<ApiResponse<LoginOtpResponse>, ApiResponse<LoginResponse>>(
-    //     builder: (context, otpRes, loginRes, child) { 
-    //       if (otpRes != null) {
-    //         // OTP response
-    //         if (otpRes.status == Status.ERROR) {
-    //           loginBloc.isLoading = false;
-    //           // Show error message
-    //           return showErrorMessage(otpRes.message, otpRes);
-    //         } else if (otpRes?.data?.status == 200) {
-    //           showToast(otpRes.data?.message);
-    //           return Container(); 
-    //         }
-    //       } else if (loginRes != null) {
-    //         // Login response
-    //         if (loginRes.status == Status.ERROR) {
-    //           loginBloc.isLoading = false;
-    //           // Show error message
-    //           return showErrorMessage(loginRes.message, loginRes);
-    //           } else if (loginRes.data?.status == 200) {
-    //             // Login successfully
-    //             showToast(loginRes.data?.message);
-    //             new Helper().setAuthToken(loginRes.data?.loginData?.accessToken);
-    //             widget.loginCallback();
-    //             return Container();
-    //           }
-    //         }
-    //         // For all other cases just return blank container.
-    //         return Container(); 
-    //     })
-    // );
-  // }
-
   Widget showForm() {
   return new Container(
       constraints: BoxConstraints(minWidth: 100, maxWidth: 400),
@@ -320,9 +257,9 @@ void validateAndSubmit() async {
             showLogo(),
             showPhoneInput(),
             showOtpInput(),
+            showLocationDropDown(LOCATION_LIST),
             showPrimaryButton(),
-            showSecondaryButton(),
-            handleApiResponse(),                
+            showSecondaryButton(),              
           ],
         ),
     )));

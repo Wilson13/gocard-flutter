@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'constants.dart' as Constants;
 import 'constants.dart';
 
@@ -11,13 +12,23 @@ enum Headers {PERSONAL_INFO, ADDRESS, PHOTO, SUBJECT, SUMMARY}
 
 class Helper {
 
+  Future<String> getLocation() async {
+    // obtain shared preferences
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(LOCATION_KEY);
+  }
+
+  Future<void> setLocation(String location) async {
+    // obtain shared preferences
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString(LOCATION_KEY, location);
+  }
+
   Future<String> getAuthToken() async {
     final storage = new FlutterSecureStorage();
 
     // Read value 
-    return null;
-    // return await storage.read(key: Constants.AUTH_KEY);
-    
+    return await storage.read(key: Constants.AUTH_KEY);
   }
 
   Future<void> setAuthToken(String value) async {

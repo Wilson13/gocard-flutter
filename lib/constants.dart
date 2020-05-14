@@ -3,12 +3,17 @@ library constants;
 import 'dart:ui';
 
 const String AUTH_KEY="AUTH_KEY";
+const String LOCATION_KEY="LOCATION";
 const String ERROR_UNAUTHORISED="UNAUTHORISED";
 const String DATE_FORMAT="dd / MM / yyyy";
 const String DATE_ISO_8601_FORMAT="yyyy-MM-dd";
 // TODO: Location should be selected and saved upon signin
 const String KIOSK_LOCATION = "amk";
+const String LOCATION_ANG_MO_KIO = "ang mo kio";
+const String LOCATION_WOODLANDS = "woodlands";
+const List<String> LOCATION_LIST = [LOCATION_ANG_MO_KIO, LOCATION_WOODLANDS];
 
+const String SUCCESS_LOGIN="Login successfully.";
 const String ERROR_NULL_RESPONSE="Something went wrong, please try again later. Err: Null response.";
 const String ERROR_NULL_USER_UID="Something went wrong, please try again later. Err: Null user uid.";
 

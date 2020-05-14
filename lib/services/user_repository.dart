@@ -8,11 +8,12 @@ import 'package:meet_queue_volunteer/response/photo_upload_response.dart';
 import 'package:meet_queue_volunteer/response/user_response.dart';
 
 import '../constants.dart';
+import '../helper.dart';
 
 class UserRepository {
   // final String baseUrl = 'https://api.queue.freshturfengineering.com/';
   ApiBaseHelper _apiHelper = ApiBaseHelper();
-
+  Helper helper = Helper();
   // Future<List<User>> getUsers() async{
   
   //   final response = await _helper.get("user");
@@ -94,7 +95,10 @@ class UserRepository {
     if (!(["", null].contains(uid))) {
 
       // update location (amk for now)
-      caseData.location = KIOSK_LOCATION;
+      caseData.location = await helper.getLocation();
+
+      if (["", null].contains(caseData.location))
+        throw Exception("No location set, please login again.");
       // Convert dob into ISO 8601 format (yyyy-MM-dd) as API accepts only this format
       String dob = DateFormat(DATE_ISO_8601_FORMAT).format(DateTime.now());
 
@@ -107,7 +111,7 @@ class UserRepository {
       return CaseResponse.fromJson(response);
 
     } else {
-      return null;
+      throw Exception("Create case failed, no user id found Please try again later.");
     }
   }
 

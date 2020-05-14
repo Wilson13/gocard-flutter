@@ -37,7 +37,7 @@ class _RootPageState extends State<RootPage> {
   void checkAuthToken() async {
     // Create storage
     // final storage = new FlutterSecureStorage();
-
+  
     // Read value 
     // String value = await storage.read(key: Constants.AUTH_KEY);
     Helper helper = new Helper();
@@ -55,13 +55,13 @@ class _RootPageState extends State<RootPage> {
     }
   }
 
-  // void loginCallback() {
-  //   // setState(() {
-  //   //   authStatus = AuthStatus.LOGGED_IN;
-  //   // });
+  void loginCallback() {
+    setState(() {
+      authStatus = AuthStatus.LOGGED_IN;
+    });
 
-  //   Navigator.pushNamed(context, "/language");
-  // }
+    // Navigator.pushNamed(context, "/language");
+  }
 
   void logoutCallback() {
     setState(() {
@@ -94,14 +94,8 @@ class _RootPageState extends State<RootPage> {
             else 
               return child;
             },
-            child: new LoginScreen()
-          )
-        );
-        break;
-      case AuthStatus.LOGGED_IN:
-      return new LanguageScreen();
-        // if (_userId.length > 0 && _userId != null) {
-          // return new HomePage(
+            child: new LoginScreen(loginCallback: loginCallback)
+            // return new HomePage(
           //   items: List<ListItem>.generate(
           //     1000,
           //     (i) => i % 6 == 0
@@ -112,6 +106,11 @@ class _RootPageState extends State<RootPage> {
           // );
         // } else
         //   return buildWaitingScreen();
+          )
+        );
+        break;
+      case AuthStatus.LOGGED_IN:
+      return new LanguageScreen();
         break;
       default:
         return buildWaitingScreen();
