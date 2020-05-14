@@ -4,6 +4,8 @@ import '../constants.dart';
 
 class LanguageScreen extends StatefulWidget {
 
+  static const routeName = '/language';
+
   const LanguageScreen();
 
   @override

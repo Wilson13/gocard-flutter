@@ -9,7 +9,9 @@ import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
 
-LoginScreen();
+  static const routeName = '/login';
+
+  LoginScreen();
 
   @override
   State<StatefulWidget> createState() => new _LoginScreenState();
@@ -187,8 +189,15 @@ void validateAndSubmit() async {
     loginBloc.isLoading = true;
     // Request OTP
     if (isOtp) {
-      await loginBloc.requestOtp(new KioskPhone.instantiate("65", _phone));
       isOtp = false;
+      // For now, can't find a better way to handle api calls without try-catch in UI.
+      // FutureBuilder has snapshot, but requires to return widget which is not required here.
+      try {
+        LoginOtpResponse otpRes = await loginBloc.requestOtp(new KioskPhone.instantiate("65", _phone));
+        showToast(otpRes.message);
+      } catch (err) {
+        showToast(err.toString());
+      }
     } else {
       // Attempt to login
       await loginBloc.loginOtp(new KioskPhone.instantiate("65", _phone), _otp);
@@ -222,26 +231,7 @@ void validateAndSubmit() async {
 
           if (loginBloc.otpRequested)
             showToast(loginBloc.msg);
-          // else if (loginBloc.hasLoggedIn)
-          //   widget.loginCallback();
-
-          return showErrorMessage(bloc.errorMsg);
-          
-          // if (otpRes != null) {
-
-          //   if (otpRes.status == Status.LOADING)
-          //     return Center();
-          //   // OTP response
-          //   if (otpRes.status == Status.ERROR) {
-          //     loginBloc.isLoading = false;
-          //     // Show error message
-          //     return showErrorMessage(otpRes.message);
-          //   } else if (otpRes?.data?.status == 200) {
-          //     showToast(otpRes.data?.message);
-          //     return Container(); 
-          //   }
-          // }
-          // return Container();
+          return showErrorMessage(bloc.errorMsg);         
         }
       )
     );

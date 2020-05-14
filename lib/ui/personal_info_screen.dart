@@ -10,6 +10,8 @@ import '../constants.dart';
 
 class PersonalInfoScreen extends StatefulWidget {
 
+  static const routeName = '/personal_info';
+  
   PersonalInfoScreen();
 
   @override

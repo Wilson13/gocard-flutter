@@ -66,13 +66,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: RootPage.routeName,//SummaryScreen.routeName,
+      initialRoute: RootPage.routeName,
       routes: {
         RootPage.routeName: (context) => RootPage(),
-        '/login': (context) => LoginScreen(),
-        '/language': (context) => LanguageScreen(),
+        LoginScreen.routeName: (context) => LoginScreen(),
+        LanguageScreen.routeName: (context) => LanguageScreen(),
         // Automatically dispose it when ChangeNotifierProvider is removed from the widget tree.
-        '/personal_info': (context) => PersonalInfoScreen(),
+        PersonalInfoScreen.routeName: (context) => PersonalInfoScreen(),
         AddressScreen.routeName: (context) => AddressScreen(),
         PhotoScreen.routeName: (context) => PhotoScreen(camera: firstCamera),
         SubjectScreen.routeName: (context) => SubjectScreen(),

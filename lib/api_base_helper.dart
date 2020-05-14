@@ -61,18 +61,18 @@ class ApiBaseHelper {
   Future<dynamic> postFile(String url, File file) async {
       var stream = new http.ByteStream(Stream.castFrom(file.openRead()));
       var length = await file.length();
-      var uri = Uri.parse(url);
+      var uri = Uri.parse(_baseUrl + url);
       var responseJson;
       String token = await helper.getAuthToken();
       Map<String, String> headers = {
-            'Content-Type': 'application/json',
+            'Content-Type': 'multipart/form-data',
             'Authorization': 'Bearer $token',
           };
       
       var request = new http.MultipartRequest("POST", uri);
-      var multipartFile = new http.MultipartFile('file', stream, length,
-          filename: basename(file.path),
-          contentType: new MediaType('image', 'png'));
+      var multipartFile = new http.MultipartFile('image', stream, length,
+          filename: basename(file.path));
+          // contentType: new MediaType('image', 'jpg'));
 
       
       request.headers.addAll(headers);
@@ -88,8 +88,11 @@ class ApiBaseHelper {
           await helper.setAuthToken("");
           throw UnauthorisedException(ERROR_UNAUTHORISED);
         }
-      } on SocketException {
+      }
+      on SocketException {
         throw FetchDataException('No Internet connection');
+      } catch (err) {
+        throw err;
       }
       return responseJson;
   }

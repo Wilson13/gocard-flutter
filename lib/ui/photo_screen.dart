@@ -11,6 +11,7 @@ import 'package:meet_queue_volunteer/ui/subject_screen.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:meet_queue_volunteer/helper.dart';
+import 'package:flutter/painting.dart';
 import 'package:path/path.dart' as Path;
 
 import '../constants.dart';
@@ -185,6 +186,7 @@ class _PhotoScreen extends State<PhotoScreen>{
                     )
                   ),
                   onPressed: () async {
+                    imageCache.clear();
                     if (photoBloc.photoPath == null && photoBloc.photoURL == null) {
                       // User hasn't taken a photo on app, or has pressed cancel button
                       // when photo on cloud exists, meaning the button is capture button.
@@ -202,6 +204,9 @@ class _PhotoScreen extends State<PhotoScreen>{
                           (await getTemporaryDirectory()).path,
                           '${userData.uid}.jpg',
                         );
+
+                        if (await File(_localPhotoPath).exists())
+                          File(_localPhotoPath).deleteSync();
 
                         // Attempt to take a picture and log where it's been saved.
                         await _controller.takePicture(_localPhotoPath);

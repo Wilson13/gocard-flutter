@@ -71,7 +71,7 @@ class _SubjectScreen extends State<SubjectScreen>{
     return new Scaffold(
       resizeToAvoidBottomInset: false,
       resizeToAvoidBottomPadding: false,
-      body: Center(child: SingleChildScrollView(
+      body: SingleChildScrollView(
         reverse: true,
         child: Padding(padding: EdgeInsets.only(bottom: bottom),
           child: new GestureDetector(
@@ -85,7 +85,7 @@ class _SubjectScreen extends State<SubjectScreen>{
               child: makeBody()
             )
           )
-      ))));
+      )));
   }
     
   Widget makeBody() {
@@ -100,22 +100,7 @@ class _SubjectScreen extends State<SubjectScreen>{
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget> [
           // Header
-          Row(children: <Widget>[
-            SizedBox(width: 180),
-            // Progress
-            Expanded(child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget> [
-                drawHeader("Personal Information", HEADER_DISABLED),
-                drawHeader("Address", HEADER_DISABLED),
-                drawHeader("Photo", HEADER_DISABLED),
-                drawHeader("Subject", HEADER_HIGHLIGHT),
-                drawHeader("Summary", HEADER_DISABLED),            
-              ]
-            )), 
-            // Cancel button
-            SizedBox(width: 180, child: drawCancelButton(context))
-          ]),
+          helper.headers(Headers.SUBJECT, navigateToRoot),
           // Content column with four rows inside
           // Expanded(child: // Disable this if centered is required
             Container(

@@ -15,8 +15,8 @@ class Helper {
     final storage = new FlutterSecureStorage();
 
     // Read value 
-    // return null;
-    return await storage.read(key: Constants.AUTH_KEY);
+    return null;
+    // return await storage.read(key: Constants.AUTH_KEY);
     
   }
 

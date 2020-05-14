@@ -7,9 +7,7 @@ import 'package:meet_queue_volunteer/bloc/summary_bloc.dart';
 import 'package:meet_queue_volunteer/response/case_response.dart';
 import 'package:meet_queue_volunteer/response/photo_upload_response.dart';
 import 'package:meet_queue_volunteer/response/user_response.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:path/path.dart' as Path;
 
 import '../constants.dart';
 import '../helper.dart';
@@ -28,7 +26,6 @@ class SummaryScreen extends StatefulWidget {
   
 class _SummaryScreen extends State<SummaryScreen>{
 
-  SummaryBloc _summaryBloc;
   bool _enableWhatsApp = false;
   // final String token;
   final RegExp postalExp = new RegExp(
@@ -38,11 +35,10 @@ class _SummaryScreen extends State<SummaryScreen>{
   );
 
   final _formKey = GlobalKey<FormState>();
-  UserData userData;
-  CaseData caseData;
+  UserData _userData;
+  CaseData _caseData;
   PhotoModel _photoModel;
-  // String selectedValue;
-
+  ScrollController _scrollController;
   final Helper helper = new Helper();
 
   String selectedValue;
@@ -53,40 +49,47 @@ class _SummaryScreen extends State<SummaryScreen>{
     // Extract the arguments from the current ModalRoute settings and cast
     // them as UserData.
     final Map<String, Object> receivedData = ModalRoute.of(context).settings.arguments;
-    caseData = receivedData["caseData"];
-    userData = receivedData["userData"];
+    _caseData = receivedData["caseData"];
+    _userData = receivedData["userData"];
     _photoModel = receivedData["photoModel"];
-
-    // Set up bloc
-    _summaryBloc = SummaryBloc(
-      userData: userData,
-      caseData: caseData
-    );
+    _scrollController = new ScrollController();
 
     final bottom = MediaQuery.of(context).viewInsets.bottom;
     return new Scaffold(
       resizeToAvoidBottomInset: false,
       resizeToAvoidBottomPadding: false,
       body:
-       Center(child: SingleChildScrollView(
-        reverse: true,
-        child: Padding(padding: EdgeInsets.only(bottom: bottom),
-          child: new GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () {
-              FocusScope.of(context).requestFocus(new FocusNode());
-              }, 
-            child: Form(
-              key: _formKey,
-              autovalidate: false,
-              child: makeBody()
+        Center(child: SingleChildScrollView(
+          controller: _scrollController,
+          reverse: true,
+          child: Padding(padding: EdgeInsets.only(bottom: bottom),
+            child: new GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                FocusScope.of(context).requestFocus(new FocusNode());
+                }, 
+              child: Form(
+                key: _formKey,
+                autovalidate: false,
+                child: makeBody()
+              )
             )
-          )
       ))));
+  }
+
+  _onLayoutDone(_){
+    _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+  }
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback(_onLayoutDone);
+    super.initState();
   }
     
   Widget makeBody() {
-    return ChangeNotifierProvider<SummaryBloc>.value(value: _summaryBloc,
+    return Provider<SummaryBloc>(
+      create: (context) => SummaryBloc(userData: _userData, caseData: _caseData),
       child: 
         Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -139,58 +142,60 @@ class _SummaryScreen extends State<SummaryScreen>{
   }
 
   Widget completeButton() {
-    return Padding(
-      padding: EdgeInsets.only(top: 30, bottom: 45), 
-      child: 
-        SizedBox(
-          width: 700,
-          height: 83,
-          child: RaisedButton(
-              shape: new RoundedRectangleBorder(
-              borderRadius: new BorderRadius.circular(20.0)),
-              color: PURPLE_THEME,
-              child: Text(
-                'Complete Registration',
-                style: TextStyle(
-                  color: Colors.white, 
-                  fontFamily: 'SourceSansPro',
-                  fontSize: 22,
-                  fontStyle: FontStyle.normal,
-                  fontWeight: FontWeight.normal
-                )
-              ),
-              onPressed: () async {
-                try {
-                  CaseResponse caseResponse;
-                  PhotoUploadResponse photoResponse;
-                  caseResponse = await _summaryBloc.createCase();
+    return Consumer<SummaryBloc>(builder: (context, summaryBloc, child) {
+      return Padding(
+        padding: EdgeInsets.only(top: 30, bottom: 45), 
+        child: 
+          SizedBox(
+            width: 700,
+            height: 83,
+            child: RaisedButton(
+                shape: new RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(20.0)),
+                color: PURPLE_THEME,
+                child: Text(
+                  'Complete Registration',
+                  style: TextStyle(
+                    color: Colors.white, 
+                    fontFamily: 'SourceSansPro',
+                    fontSize: 22,
+                    fontStyle: FontStyle.normal,
+                    fontWeight: FontWeight.normal
+                  )
+                ),
+                onPressed: () async {
+                  try {
+                    CaseResponse caseResponse;
+                    PhotoUploadResponse photoResponse;
+                    caseResponse = await summaryBloc.createCase();
 
-                  if (caseResponse == null)
-                    // Display error response
-                    helper.displayToast(ERROR_NULL_RESPONSE);
-                  else {
-                    // Case created
-                    // Update photo if necessary
-                    if (_photoModel.isLocal) {
-                      photoResponse = await _summaryBloc.uploadUserPhoto(_photoModel.uri);
-                    }
-
-                    if (photoResponse != null)
-                      helper.displayToast(caseResponse.message);
+                    if (caseResponse == null)
+                      // Display error response
+                      helper.displayToast(summaryBloc.errorMsg);
                     else {
-                      helper.displayToast(caseResponse.message + " But there was an error uploading your photo.");
+                      // Case created
+                      // Update photo if necessary
+                      if (_photoModel.isLocal) {
+                        photoResponse = await summaryBloc.uploadUserPhoto(_photoModel.uri);
+                      }
+
+                      if (photoResponse != null)
+                        helper.displayToast(caseResponse.message);
+                      else {
+                        helper.displayToast(caseResponse.message + " But there was an error uploading your photo.");
+                      }
+                      Navigator.popUntil(context, ModalRoute.withName(RootPage.routeName.toString()));
                     }
-                    Navigator.popUntil(context, ModalRoute.withName(RootPage.routeName.toString()));
+                  } catch(e) {
+                      // If error is unauthorised
+                      if (e.toString() == ERROR_UNAUTHORISED)
+                        navigateToRoot();
+                      else 
+                        helper.displayToast(e.toString());
                   }
-                } catch(e) {
-                    // If error is unauthorised
-                    if (e.toString() == ERROR_UNAUTHORISED)
-                      navigateToRoot();
-                    else 
-                      helper.displayToast(e.toString());
                 }
-              }
-    )));
+      )));
+    });
   }
 
   Widget drawSectionHeader(String title) {
@@ -230,7 +235,7 @@ class _SummaryScreen extends State<SummaryScreen>{
     if (!_photoModel.isLocal) 
       imageChild = CircleAvatar(backgroundImage: NetworkImage(_photoModel.uri));
     else {
-      imageChild = ClipOval(child: Image.file(File(_photoModel.uri)));
+      imageChild = CircleAvatar(backgroundImage: FileImage(File(_photoModel.uri)));
     }
     return Container(
       padding: EdgeInsets.fromLTRB(45, 35, 45, 35),
@@ -279,10 +284,10 @@ class _SummaryScreen extends State<SummaryScreen>{
       padding: EdgeInsets.fromLTRB(45, 35, 45, 35),
       child:
       Column(children: <Widget>[
-        subjectRow('Subject', caseData.subject),
-        subjectRow('Preferred Language', caseData.language),
-        subjectRow('Brief Description', caseData.description),
-        subjectRow('Contact', userData.phone),
+        subjectRow('Subject', _caseData.subject),
+        subjectRow('Preferred Language', _caseData.language),
+        subjectRow('Brief Description', _caseData.description),
+        subjectRow('Contact', _userData.phone),
       ]));
   }
 
@@ -349,28 +354,28 @@ class _SummaryScreen extends State<SummaryScreen>{
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          drawParticulars(userData.name),
-          drawParticulars(userData.nric),
-          drawParticulars(toBeginningOfSentenceCase(userData.gender)),
-          drawParticulars(toBeginningOfSentenceCase(userData.race)),
-          drawParticulars(DateFormat(DATE_FORMAT).format(userData.dob)),
-          drawParticulars(userData.occupation),
+          drawParticulars(_userData.name),
+          drawParticulars(_userData.nric),
+          drawParticulars(toBeginningOfSentenceCase(_userData.gender)),
+          drawParticulars(toBeginningOfSentenceCase(_userData.race)),
+          drawParticulars(DateFormat(DATE_FORMAT).format(_userData.dob)),
+          drawParticulars(_userData.occupation),
       ]);
   }
 
   Widget addressContentRow() {
     String floorStr;
 
-    if (!["", null].contains(userData.floorNo))
-      floorStr = userData.floorNo + "-";
+    if (!["", null].contains(_userData.floorNo))
+      floorStr = _userData.floorNo + "-";
 
-    floorStr += userData.unitNo;
+    floorStr += _userData.unitNo;
     return 
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          drawParticulars(userData.postalCode.toString()),
-          drawParticulars(userData.blockHseNo),
+          drawParticulars(_userData.postalCode.toString()),
+          drawParticulars(_userData.blockHseNo),
           drawParticulars(floorStr),
           drawParticulars('Upper Thompson Road'),
           drawParticulars('15 / 03/ 1985'),
