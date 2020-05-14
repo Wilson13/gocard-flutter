@@ -37,7 +37,7 @@ Future<void> main() async {
       // English
       Locale('en', 'SG'),
       // Mandarin
-      const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans', countryCode: 'SG'),
+      // const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans', countryCode: 'SG'),
       // Malay
       Locale('ms', 'SG'),
       // Tamil
@@ -67,9 +67,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: RootPage.routeName,
       routes: {
-        RootPage.routeName: (context) => RootPage(),
-        LoginScreen.routeName: (context) => LoginScreen(),
-        LanguageScreen.routeName: (context) => LanguageScreen(),
+        RootPage.routeName: (context) => RootPage(),        
         // Automatically dispose it when ChangeNotifierProvider is removed from the widget tree.
         PersonalInfoScreen.routeName: (context) => PersonalInfoScreen(),
         AddressScreen.routeName: (context) => AddressScreen(),

@@ -14,16 +14,6 @@ class UserRepository {
   // final String baseUrl = 'https://api.queue.freshturfengineering.com/';
   ApiBaseHelper _apiHelper = ApiBaseHelper();
   Helper helper = Helper();
-  // Future<List<User>> getUsers() async{
-  
-  //   final response = await _helper.get("user");
-  //   if (response.statusCode == 200)
-  //     return UserResponse.fromJson(response.body).data;
-  //   else {
-  //     print(response.body);
-  //     throw Exception('Error from getUsers');
-  //   }
-  // }
 
   Future<UserResponse> searchUser(String nric) async{
   
