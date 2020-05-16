@@ -11,7 +11,7 @@
 
 The idea of GoCard Banking App is about providing and combining all perks and incentives to consumers with one card, which usually requires consumer to own at least a few credit cards to do so.
 
-Gamification of the user experience is also what makes this app fun to use, each reward path has their own game character which has differnt levels and special abilities. For example, cashback on dining is a Diner character that has the special ability to dine at any restaurant for 1% cashback reward, and the higher the level it reaches, the more abilities can be unlocked.
+Gamification of the user experience is also what makes this app fun to use, each reward path has their own game character which has different levels and special abilities. For example, cashback on dining is a Diner character that has the special ability to dine at any restaurant for 1% cashback reward, and the higher the level it reaches, the more abilities can be unlocked.
 
 ## Game Characters
  
@@ -19,9 +19,9 @@ Gamification of the user experience is also what makes this app fun to use, each
 
  *Fig. 3: Dining Character*
 
- ![Alt text](/marketing/big_ticket.png?raw=true "Big Ticket Expense")
+ ![Alt text](/marketing/big_ticket.png?raw=true "Big Ticket Purchase")
 
- *Fig. 4: Big Ticket Expense Character*
+ *Fig. 4: Big Ticket Purchase Character*
 
  ![Alt text](/marketing/shopper.png?raw=true "Shopper")
  
