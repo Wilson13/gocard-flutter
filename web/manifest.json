@@ -1,6 +1,6 @@
 {
-    "name": "meet_queue_volunteer",
-    "short_name": "meet_queue_volunteer",
+    "name": "perks_card",
+    "short_name": "perks_card",
     "start_url": ".",
     "display": "minimal-ui",
     "background_color": "#0175C2",

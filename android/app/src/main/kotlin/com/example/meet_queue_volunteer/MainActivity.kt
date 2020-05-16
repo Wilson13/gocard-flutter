@@ -1,4 +1,4 @@
-package com.example.meet_queue_volunteer
+package com.example.perks_card
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity

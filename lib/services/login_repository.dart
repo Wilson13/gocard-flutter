@@ -1,30 +1,23 @@
-import 'package:meet_queue_volunteer/api_base_helper.dart';
-import 'package:meet_queue_volunteer/response/login_otp_response.dart';
-import 'package:meet_queue_volunteer/response/login_response.dart';
+import 'dart:io';
+
+import 'package:perks_card/response/authenticate_response.dart';
+
+import '../api_base_helper.dart';
 
 class LoginRepository {
   // final String baseUrl = 'https://api.queue.freshturfengineering.com/';
-  ApiBaseHelper _helper = ApiBaseHelper();
+  ApiBaseHelper _apiHelper = ApiBaseHelper();
 
-  Future<LoginResponse> loginOtp(KioskPhone kioskPhone, String otp) async{
-
-    Map reqBody = {
-      "kioskPhone": kioskPhone,
-      "loginType": "otp",
-      "otp": otp
-    };
-
-    final response = await _helper.post("kiosk/manager/authorize", reqBody);
-    return LoginResponse.fromJson(response);
-  }
-
-  Future<LoginOtpResponse> requestOtp(KioskPhone kioskPhone) async{
-  
-    Map reqBody = {
-      "kioskPhone": kioskPhone
-    };
-
-    final response = await _helper.post("kiosk/manager/otp", reqBody);
-    return LoginOtpResponse.fromJson(response);
+  Future<AuthenticateResponse> authenticatePhoto({String phone, File photo}) async{
+    if (!(["", null].contains(phone))) {
+      try {
+      final response = await _apiHelper.authenticatePhoto("face/" + phone, photo);
+      return AuthenticateResponse.fromJson(response);
+      } catch(err) {
+        throw Exception(err.toString());
+      }
+    } else {
+      throw Exception('Phone can\'t be null.');
+    }
   }
 }
