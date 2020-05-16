@@ -1,10 +1,10 @@
 # GoCard
 
-![Alt text](./marketing/app_dark.jpg?raw=true "Dark version app screenshots")
+![Alt text](/marketing/app_dark.png?raw=true "Dark version app screenshots")
 
-![Alt text](./marketing/app_white.jpg?raw=true "White version app screenshots")
+![Alt text](/marketing/app_white.png?raw=true "White version app screenshots")
 
-An app that makes credit cards exciting again.
+## An app that makes credit cards exciting again.
 
 The idea of GoCard Banking App is about providing and combining all perks and incentives to consumers with one card, which usually requires consumer to own at least a few credit cards to do so.
 
