@@ -1,16 +1,15 @@
-# perks_card
+# GoCard
 
-A new Flutter project.
+## Description
 
-## Getting Started
+An app that makes credit cards exciting again.
 
-This project is a starting point for a Flutter application.
+## APIs used
 
-A few resources to get you started if this is your first Flutter project:
+### Mambu
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+#### 2.2 Current Account - Transfer
+For making payment to merchant.
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+#### 2.5 Get Current Account by ID
+For getting account balance.
