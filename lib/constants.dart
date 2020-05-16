@@ -8,6 +8,11 @@ const String ERROR_UNAUTHORISED="UNAUTHORISED";
 const String DATE_FORMAT="dd / MM / yyyy";
 const String DATE_ISO_8601_FORMAT="yyyy-MM-dd";
 
+// Due to time constraint, tokens and credentials are stored here in an insecured way.
+// However, with enough time, these tokens should be stored in a back end service
+// that runs behind an API gateway with proper Auth module set up.
+
+// The purpose of this app is solely to illustrate the user experience.
 const String M_URL = 'https://razerhackathon.sandbox.mambu.com/api/';
 const String M_USERNAME = 'Team5';
 const String M_PASSWORD = 'pass121868143E';
