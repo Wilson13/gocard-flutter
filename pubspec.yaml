@@ -64,6 +64,7 @@ flutter:
      - assets/images/big_ticket.png
      - assets/images/lounge.png
      - assets/images/shopper.png
+     - assets/images/travel.png
      - assets/images/home.png
      - assets/images/location.png
      - assets/images/coupons.png

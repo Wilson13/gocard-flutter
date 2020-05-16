@@ -35,6 +35,10 @@ Gamification of the user experience is also what makes this app fun to use, each
 
  *Fig. 7: Daily Expense Character*
 
+ ![Alt text](/marketing/travel.png?raw=true "Travel")
+
+ *Fig. 7: Travel Character*
+
 ## APIs used
 
 ### Mambu

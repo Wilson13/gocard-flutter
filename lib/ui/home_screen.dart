@@ -243,7 +243,7 @@ class _HomeScreen extends State<HomeScreen>{
             SizedBox(width: 8),
             drawCharacter('Shopping', 'assets/images/shopper.png', 'Level 6', 'Exp 15/50', BG_SHOPPING),
             SizedBox(width: 8),
-            drawCharacter('Travel', 'assets/images/daily.png', 'Level 6', 'Exp 15/50', BG_TRAVEL),
+            drawCharacter('Travel', 'assets/images/travel.png', 'Level 6', 'Exp 15/50', BG_TRAVEL),
           ]
     ));
   }
