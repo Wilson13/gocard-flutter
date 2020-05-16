@@ -1,8 +1,8 @@
 # GoCard
 
-![Alt text](marketing/app_dark.jpg?raw=true "Dark version app screenshots")
+![Alt text](./marketing/app_dark.jpg?raw=true "Dark version app screenshots")
 
-![Alt text](marketing/app_white.jpg?raw=true "White version app screenshots")
+![Alt text](./marketing/app_white.jpg?raw=true "White version app screenshots")
 
 An app that makes credit cards exciting again.
 
