@@ -52,3 +52,8 @@ For getting account balance.
 ### AWS Rekognition
 
 A self-hosted backend services that utilises AWS Rekognition to provide facial recognition APIs to front end applications that can run on any hardware as long as camera is available, hence removing the need of on-device Machine Learning/AI algorithm.
+
+## Screenshots 
+![Alt text](/marketing/app_screenshots.png?raw=true "Actual App Screenshots")
+
+*Fig. 7: Actual App Screenshots*
