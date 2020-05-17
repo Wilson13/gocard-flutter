@@ -56,4 +56,4 @@ A self-hosted backend services that utilises AWS Rekognition to provide facial r
 ## Screenshots 
 ![Alt text](/marketing/app_screenshots.png?raw=true "Actual App Screenshots")
 
-*Fig. 7: Actual App Screenshots*
+*Fig. 8: Actual App Screenshots*
